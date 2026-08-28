@@ -187,7 +187,7 @@ Build the persistent relational data layer and pgvector foundation safely.
 
 # Phase 3 — RAG Knowledge Base & Ingestion
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -197,10 +197,9 @@ Turn the curated official Razorpay documentation into a searchable vector knowle
 
 ```text
 Rag/
-└── sources/
     ├── 01-about-settlements.md
     ├── 02-settlement-breakup.md
-    ├── 03-settlement-api.md
+    ├── 03-settlement-apis.md
     ├── 04-settlement-api-reference.md
     ├── 05-settlement-faqs.md
     └── 06-settlement-details.md
@@ -212,37 +211,38 @@ Rag/
 
 ### Checklist
 
-- [ ] Verify each source is an official Razorpay source.
-- [ ] Keep source URL in metadata/content.
-- [ ] Curate relevant content instead of blindly copying entire websites.
-- [ ] Build document loader.
-- [ ] Normalize Markdown/text.
-- [ ] Split documents into meaningful chunks.
-- [ ] Preserve document title.
-- [ ] Preserve section/heading metadata.
-- [ ] Preserve source URL metadata.
-- [ ] Generate embeddings.
-- [ ] Store embeddings in Supabase pgvector.
-- [ ] Store chunk metadata.
-- [ ] Prevent accidental duplicate ingestion.
-- [ ] Make ingestion repeatable/idempotent.
-- [ ] Implement ingestion error handling.
-- [ ] Log failed documents/chunks.
-- [ ] Implement retrieval.
-- [ ] Implement top-k similarity search.
-- [ ] Return source metadata with retrieved chunks.
+- [x] Verify each source is an official Razorpay source.
+- [x] Keep source URL in metadata/content.
+- [x] Curate relevant content instead of blindly copying entire websites.
+- [x] Build document loader (`src/rag/loaders/markdownLoader.js`).
+- [x] Normalize Markdown/text.
+- [x] Split documents into meaningful chunks (`src/rag/splitters/textSplitter.js`).
+- [x] Preserve document title.
+- [x] Preserve section/heading metadata.
+- [x] Preserve source URL metadata.
+- [x] Generate embeddings (`src/rag/embeddings/hfEmbeddings.js`).
+- [x] Store 1024-dimensional embeddings in Supabase pgvector (`rag_chunks.embedding`).
+- [x] Store chunk metadata.
+- [x] Prevent accidental duplicate ingestion.
+- [x] Make ingestion repeatable/idempotent (`src/rag/ingestion/ingestPipeline.js`).
+- [x] Implement ingestion error handling.
+- [x] Log failed documents/chunks.
+- [x] Implement retrieval (`src/rag/retriever/ragRetriever.js`).
+- [x] Implement top-k similarity search (`match_rag_chunks`).
+- [x] Return source metadata with retrieved chunks.
+- [x] Expose REST API search and ingestion endpoints (`POST /api/rag/search`, `POST /api/rag/ingest`, `GET /api/rag/documents`).
 
 ### Verification
 
-- [ ] All intended source documents ingest successfully.
-- [ ] No duplicate chunks appear after a repeated ingestion.
-- [ ] A known settlement question retrieves the expected source.
-- [ ] Retrieved chunks contain enough context to be useful.
-- [ ] Source attribution survives retrieval.
+- [x] All 6 intended source documents ingest successfully (54 chunks generated and stored).
+- [x] No duplicate chunks appear after repeated ingestion.
+- [x] Known settlement questions retrieve expected sources with similarity scores up to 0.8337.
+- [x] Retrieved chunks contain section titles and full context.
+- [x] Source attribution survives retrieval.
 
 ### Git checkpoint
 
-- [ ] Commit: `feat: implement rag ingestion and retrieval`
+- [x] Commit: `feat: implement rag ingestion and retrieval`
 
 ---
 
