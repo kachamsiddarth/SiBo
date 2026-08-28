@@ -10,7 +10,7 @@
 - **Official Product Name:** **SiBo** (AI Finance Controller)
 - **Primary Objective:** Build an autonomous payment & settlement reconciliation engine with RAG-based AI exception investigation for Razorpay Buildathon Track 04.
 - **Frontend Stack:** React (v18), Vite, React Router (v7), Recharts, Lucide Icons.
-- **Visual Design Language:** **NEOBRUTALISM / NEOBRUTALIST** (Dark mode, bold black/dark borders, high contrast, hard-edged corners, zero glassmorphism, zero soft gradients, solid offset shadows `4px 4px 0px #000`).
+- **Visual Design Language:** **NEOBRUTALISM / NEOBRUTALIST** (Dark mode, bold black/dark borders, high contrast, hard-edged corners, zero glassmorphism, zero soft gradients, solid offset shadows `3px 3px 0px #000`).
 - **Backend Stack:** Node.js (v22), Express.js, Zod validation, Multer, csv-parse.
 - **AI & RAG Architecture:**
   - **Orchestration:** LangChain.js
@@ -33,24 +33,26 @@
 - Zod environment validation module (`backend/src/config/env.js`).
 - Express server, error handling middleware, and `/api/health` route created.
 
-### Phase 2: Supabase Database, Safe Migrations & Model Upgrade [Completed]
+### Phase 2: Supabase Database, Safe Migrations & Model Upgrade [Completed & Verified Live]
 - **Groq LLM Model Updated:** Configured `GROQ_MODEL=openai/gpt-oss-120b` dynamically across `.env`, `.env.example`, `env.js`, and `groq.js`.
 - **Hugging Face Client Configured:** `hf.js` configured with `Qwen/Qwen3-Embedding-0.6B` outputting 1024 dimensions.
-- **Supabase Client Configured:** `supabase.js` configured with backend service role authentication.
-- **Database Schema Migration Created:** `backend/migrations/001_initial_schema.sql` created containing:
-  1. `pgvector` extension & `pgcrypto` extension enablement.
-  2. `reconciliation_runs` table (run metadata, counts, match rate).
-  3. `payment_records` table (synthetic/uploaded transactions).
-  4. `settlement_records` table (settlement details, fee, tax, adjustment, refund).
-  5. `reconciliation_results` table (deterministic expected vs actual reconciliation).
-  6. `exceptions` table (unresolved mismatch records).
-  7. `ai_investigations` table (LangChain/Groq investigation audit trail).
-  8. `rag_documents` table (RAG source documents metadata).
-  9. `rag_chunks` table (`embedding vector(1024)` column for vector search).
-  10. `match_rag_chunks` PL/pgSQL similarity search function.
-  11. Indexing strategy on foreign keys and `transaction_id` columns.
+- **Supabase CLI Linked:** Project ref `woxlkibjxoaczispngeq` linked.
+- **Migrations Executed & Pushed to Remote Database**:
+  - `supabase/migrations/20260828000000_initial_schema.sql` pushed to remote Supabase via `npx supabase db push`.
+  - `supabase/migrations/20260828000001_grant_permissions.sql` pushed to grant permissions to `service_role` and API clients.
+- **Live Database Tables Verified on Supabase PostgreSQL**:
+  1. `pgvector` & `pgcrypto` extensions enabled.
+  2. `reconciliation_runs` table created & verified.
+  3. `payment_records` table created & verified.
+  4. `settlement_records` table created & verified.
+  5. `reconciliation_results` table created & verified.
+  6. `exceptions` table created & verified.
+  7. `ai_investigations` table created & verified.
+  8. `rag_documents` table created & verified.
+  9. `rag_chunks` table (`embedding vector(1024)`) created & verified.
+  10. `match_rag_chunks` PL/pgSQL similarity search function created.
+- **Application CRUD Verification Passed**: Executed `backend/src/scripts/test_db_crud.js` against live Supabase PostgreSQL — verified record insertion, foreign key linking, cascade deletion, and vector store schema.
 - **Neobrutalism Design System Applied:** Updated `frontend/src/index.css` and `frontend/src/App.jsx` with dark Neobrutalist components, sharp borders, high contrast badges, and solid shadows.
-- **Live Health Status Check Verified:** Backend live test connected to Supabase PostgreSQL and reported `llmModel: openai/gpt-oss-120b`, `embeddingModel: Qwen/Qwen3-Embedding-0.6B`, `embeddingDimension: 1024`.
 
 ---
 

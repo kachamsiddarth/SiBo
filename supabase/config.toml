@@ -1,0 +1,12 @@
+# Supabase CLI Project Configuration
+project_id = "woxlkibjxoaczispngeq"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
