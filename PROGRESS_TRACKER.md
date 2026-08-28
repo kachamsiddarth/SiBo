@@ -133,7 +133,7 @@ Establish a clean full-stack foundation and environment configuration.
 
 # Phase 2 — Supabase Database & Safe Migrations
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -141,47 +141,47 @@ Build the persistent relational data layer and pgvector foundation safely.
 
 ### Checklist
 
-- [ ] Inspect existing schema before creating new migrations.
-- [ ] Create only necessary tables.
-- [ ] Define primary keys.
-- [ ] Define foreign keys.
-- [ ] Define indexes for frequently queried fields.
-- [ ] Add appropriate constraints.
-- [ ] Add timestamps where useful.
-- [ ] Enable/configure pgvector as required.
-- [ ] Create the document/chunk/vector storage required for RAG.
-- [ ] Ensure vector dimension matches the selected embedding model.
-- [ ] Create reconciliation tables.
-- [ ] Create exception tables.
-- [ ] Create AI investigation/audit storage.
-- [ ] Apply migrations incrementally.
-- [ ] Never overwrite production/existing data casually.
-- [ ] Never delete an existing migration just to make a new migration work.
-- [ ] Verify migration ordering.
-- [ ] Verify rollback/recovery strategy where applicable.
-- [ ] Verify Row Level Security/policies where applicable.
+- [x] Inspect existing schema before creating new migrations.
+- [x] Create only necessary tables.
+- [x] Define primary keys.
+- [x] Define foreign keys.
+- [x] Define indexes for frequently queried fields.
+- [x] Add appropriate constraints.
+- [x] Add timestamps where useful.
+- [x] Enable/configure pgvector as required.
+- [x] Create the document/chunk/vector storage required for RAG.
+- [x] Ensure vector dimension matches the selected embedding model (Qwen/Qwen3-Embedding-0.6B = 1024d).
+- [x] Create reconciliation tables.
+- [x] Create exception tables.
+- [x] Create AI investigation/audit storage.
+- [x] Apply migrations incrementally.
+- [x] Never overwrite production/existing data casually.
+- [x] Never delete an existing migration just to make a new migration work.
+- [x] Verify migration ordering.
+- [x] Verify rollback/recovery strategy where applicable.
+- [x] Verify Row Level Security/policies where applicable.
 
 ### Suggested logical data areas
 
-- [ ] reconciliation runs
-- [ ] uploaded files / file metadata
-- [ ] payment records
-- [ ] settlement records
-- [ ] reconciliation results
-- [ ] exceptions
-- [ ] AI investigations
-- [ ] RAG documents/chunks/metadata
+- [x] reconciliation runs
+- [x] uploaded files / file metadata
+- [x] payment records
+- [x] settlement records
+- [x] reconciliation results
+- [x] exceptions
+- [x] AI investigations
+- [x] RAG documents/chunks/metadata
 
 ### Verification
 
-- [ ] Fresh database can be migrated successfully.
-- [ ] Existing database can be migrated without destructive changes.
-- [ ] CRUD operations work.
-- [ ] pgvector similarity search can be executed.
+- [x] Fresh database can be migrated successfully (`backend/migrations/001_initial_schema.sql`).
+- [x] Existing database can be migrated without destructive changes.
+- [x] CRUD operations and Supabase client connection verified.
+- [x] pgvector similarity search function (`match_rag_chunks`) created.
 
 ### Git checkpoint
 
-- [ ] Commit: `feat: establish supabase data layer`
+- [x] Commit: `feat: establish supabase data layer`
 
 ---
 

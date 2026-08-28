@@ -10,7 +10,7 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().default('placeholder_service_role_key'),
   SUPABASE_ANON_KEY: z.string().default('placeholder_anon_key'),
   GROQ_API_KEY: z.string().default('placeholder_groq_api_key'),
-  GROQ_MODEL: z.string().default('llama-3.3-70b-versatile'),
+  GROQ_MODEL: z.string().default('openai/gpt-oss-120b'),
   HF_TOKEN: z.string().default('placeholder_hf_token'),
   HF_EMBEDDING_MODEL: z.string().default('Qwen/Qwen3-Embedding-0.6B'),
 });
