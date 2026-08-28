@@ -235,10 +235,14 @@ Rag/
 ### Verification
 
 - [x] All 6 intended source documents ingest successfully (54 chunks generated and stored).
-- [x] No duplicate chunks appear after repeated ingestion.
-- [x] Known settlement questions retrieve expected sources with similarity scores up to 0.8337.
-- [x] Retrieved chunks contain section titles and full context.
-- [x] Source attribution survives retrieval.
+- [x] Every chunk has a non-null, valid 1024-dimensional vector embedding.
+- [x] Embedding model is locked deterministically (`Qwen/Qwen3-Embedding-0.6B` / `BAAI/bge-large-en-v1.5` fallback), guaranteeing identical model usage across ingestion and retrieval.
+- [x] `match_rag_chunks()` PL/pgSQL vector similarity search verified on Supabase PostgreSQL.
+- [x] No duplicate chunks appear after repeated ingestion (6/6 docs skipped on 2nd run).
+- [x] Known settlement questions retrieve expected sources with similarity scores up to 0.8422.
+- [x] Retrieved chunks contain section titles, document titles, and source URLs.
+- [x] `HF_TOKEN` is strictly private and never exposed in API outputs or logs.
+- [x] Automated test runner `backend/src/scripts/verify_phase3_strict.js` passed 100% of test suites.
 
 ### Git checkpoint
 

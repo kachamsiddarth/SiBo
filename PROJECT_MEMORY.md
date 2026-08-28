@@ -8,7 +8,7 @@
 ## 1. Project Identity & Current Phase
 
 - **Official Product Name:** **SiBo** (AI Finance Controller)
-- **Current Completed Phase:** **Phase 3 — RAG Knowledge Base & Vector Retrieval**
+- **Current Completed Phase:** **Phase 3 — RAG Knowledge Base & Vector Retrieval (Strictly Verified)**
 - **Primary Objective:** Autonomous payment settlement reconciliation & AI exception investigation engine for Razorpay Buildathon Track 04.
 - **Frontend Stack:** React (v18), Vite, React Router (v7), Recharts, Lucide Icons.
 - **Visual Design Language:** **NEOBRUTALISM / NEOBRUTALIST** (Dark mode, bold black/dark borders, high contrast, hard-edged corners, solid offset shadows `3px 3px 0px #000`).
@@ -25,7 +25,7 @@ Express.js Backend API
     ↓
 LangChain.js Document Splitters & Loaders
     ↓
-Hugging Face Embeddings (1024-dim)
+Hugging Face Embeddings (1024-dim, Locked Model)
     ↓
 Supabase pgvector (rag_documents + rag_chunks)
     ↓
@@ -36,7 +36,7 @@ LangChain + Groq LLM (openai/gpt-oss-120b) AI Investigation
 
 ---
 
-## 3. Work Completed so far
+## 3. Work Completed & Verified
 
 ### Phase 0: Repository Inspection & Requirements Alignment [Completed]
 - Analyzed `MASTER_BUILD_SPEC.md`, `PROGRESS_TRACKER.md`, and 6 official Razorpay settlement documentation markdown files in `Rag/`.
@@ -51,36 +51,31 @@ LangChain + Groq LLM (openai/gpt-oss-120b) AI Investigation
 - Supabase migrations pushed via CLI (`20260828000000_initial_schema.sql` and `20260828000001_grant_permissions.sql`).
 - All 8 tables, foreign keys, RLS grants, `pgvector` extension, and `match_rag_chunks()` function verified live on Supabase PostgreSQL.
 
-### Phase 3: RAG Knowledge Base & Ingestion Pipeline [Completed & Verified]
-- **Document Discovery & Loader:** `backend/src/rag/loaders/markdownLoader.js` discovers 6 official Razorpay Markdown documents:
-  1. `01-about-settlements.md` ("About Settlements")
-  2. `02-settlement-breakup.md` ("Settlement Breakup & Fees")
-  3. `03-settlement-apis.md` ("Settlement APIs Workflow")
-  4. `04-settlement-api-reference.md` ("Settlement API Specification")
-  5. `05-settlement-faqs.md` ("Settlement FAQs")
-  6. `06-settlement-details.md` ("Settlement Details & Reports")
-- **Chunking & Header Preservation:** `backend/src/rag/splitters/textSplitter.js` splits documents into 54 contextual chunks using `RecursiveCharacterTextSplitter` while preserving section headers, document titles, and metadata.
-- **1024-Dimension Vector Embeddings:** `backend/src/rag/embeddings/hfEmbeddings.js` generates 1024-dimensional embeddings via Hugging Face (`Qwen/Qwen3-Embedding-0.6B` with `BAAI/bge-large-en-v1.5` fallback).
-- **Idempotent Ingestion Pipeline:** `backend/src/rag/ingestion/ingestPipeline.js` populates `rag_documents` and `rag_chunks` tables without creating duplicates on repeated runs.
-- **Semantic Vector Retriever:** `backend/src/rag/retriever/ragRetriever.js` queries `match_rag_chunks()` in Supabase pgvector and returns top-k matching chunks with similarity scores (e.g. 0.8337 matching accuracy).
-- **RAG REST API Endpoints:** `backend/src/routes/rag.js` exposes:
-  - `POST /api/rag/search`: Semantic vector query execution.
-  - `POST /api/rag/ingest`: Programmatic trigger for document ingestion.
-  - `GET /api/rag/documents`: RAG knowledge base statistics.
+### Phase 3: RAG Knowledge Base & Ingestion Pipeline [Completed & Strictly Verified]
+- **Document Loader & Metadata:** `backend/src/rag/loaders/markdownLoader.js` loaded all 6 official Razorpay Markdown documents into `rag_documents`.
+- **Text Chunking:** `backend/src/rag/splitters/textSplitter.js` created 54 chunks with section title & URL metadata.
+- **1024d Vector Model Locking:** `backend/src/config/hf.js` locks the active embedding model deterministically, guaranteeing identical model usage across ingestion and query retrieval.
+- **Supabase pgvector Vector Store:** `backend/src/rag/ingestion/ingestPipeline.js` stored 54 non-null 1024d vector embeddings in `rag_chunks`.
+- **Vector Search Accuracy:** `backend/src/rag/retriever/ragRetriever.js` queries `match_rag_chunks()` with similarity scores up to **0.8422**.
+- **Idempotency Verified:** Running ingestion twice created 0 duplicate documents and 0 duplicate chunks (6/6 docs skipped on repeat run).
+- **Security Verified:** `HF_TOKEN` is strictly backend-only and never exposed in API endpoints.
+- **Automated Verification Suite:** `backend/src/scripts/verify_phase3_strict.js` passed 100% of tests on live Supabase PostgreSQL.
 
 ---
 
-## 4. Database Schema Summary
+## 4. Phase 3 Verification Audit Trail
 
-- `reconciliation_runs`: Track reconciliation runs.
-- `payment_records`: Uploaded/synthetic payment records.
-- `settlement_records`: Uploaded/synthetic settlement records.
-- `reconciliation_results`: Deterministic calculation results.
-- `exceptions`: Unresolved discrepancy records.
-- `ai_investigations`: AI reasoning & evidence audit trail.
-- `rag_documents`: RAG source document metadata.
-- `rag_chunks`: Chunks and `embedding vector(1024)` column.
-- PL/pgSQL function: `match_rag_chunks(query_embedding vector(1024), match_threshold float, match_count int)`.
+| Verification Item | Status | Result / Metric |
+| :--- | :--- | :--- |
+| 1. Six official Razorpay docs loaded in `rag_documents` | `PASSED` | 6 documents present |
+| 2. Non-null 1024d embeddings in `rag_chunks` | `PASSED` | 54 chunks with 1024d vectors |
+| 3, 4, 5. Model locking & ingestion/retrieval consistency | `PASSED` | Model locked deterministically |
+| 6. `match_rag_chunks()` RPC similarity search | `PASSED` | Cosine similarity search verified |
+| 7. Domain query relevance | `PASSED` | Top similarity **0.8422** |
+| 8. Idempotency test (repeat ingestion) | `PASSED` | 0 duplicate chunks created |
+| 9. `HF_TOKEN` private protection | `PASSED` | 0 token leaks in API responses |
+| 10. RAG REST API endpoints | `PASSED` | `/api/rag/search` and `/api/rag/documents` operational |
+| 11. Error handling for edge cases | `PASSED` | Empty queries & bad requests handled |
 
 ---
 
