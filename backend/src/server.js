@@ -5,6 +5,7 @@ import healthRouter from './routes/health.js';
 import ragRouter from './routes/rag.js';
 import uploadRouter from './routes/upload.js';
 import reconciliationRouter from './routes/reconciliation.js';
+import aiRouter from './routes/ai.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -19,6 +20,8 @@ app.use('/api', healthRouter);
 app.use('/api', ragRouter);
 app.use('/api', uploadRouter);
 app.use('/api', reconciliationRouter);
+app.use('/api', aiRouter);
+
 
 
 // Root Route
