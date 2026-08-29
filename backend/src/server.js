@@ -3,6 +3,8 @@ import cors from 'cors';
 import { env, validateSecretsForProduction } from './config/env.js';
 import healthRouter from './routes/health.js';
 import ragRouter from './routes/rag.js';
+import uploadRouter from './routes/upload.js';
+import reconciliationRouter from './routes/reconciliation.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -15,6 +17,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // API Routes
 app.use('/api', healthRouter);
 app.use('/api', ragRouter);
+app.use('/api', uploadRouter);
+app.use('/api', reconciliationRouter);
+
 
 // Root Route
 app.get('/', (req, res) => {
