@@ -7,3 +7,7 @@ build/
 .DS_Store
 coverage/
 *.log
+# Project internal documentation
+MASTER_BUILD_SPEC.md
+PROGRESS_TRACKER.md
+PROJECT_MEMORY.md
