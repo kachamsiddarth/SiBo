@@ -126,4 +126,69 @@ router.get('/exceptions/:exceptionId', async (req, res, next) => {
   }
 });
 
+/**
+ * @route   GET /api/dashboard/summary
+ * @desc    Aggregate operational summary across all reconciliation runs for the dashboard
+ * @access  Public
+ */
+router.get('/dashboard/summary', async (req, res, next) => {
+  try {
+    // Total runs
+    const { data: runs, error: runsErr } = await supabase
+      .from('reconciliation_runs')
+      .select('id, total_records, matched_count, exception_count, match_rate, status, file_name, created_at')
+      .order('created_at', { ascending: false });
+    if (runsErr) throw runsErr;
+
+    // All exceptions
+    const { data: exceptions, error: excErr } = await supabase
+      .from('exceptions')
+      .select('id, category, ai_investigation_status, status');
+    if (excErr) throw excErr;
+
+    // All ai_investigations
+    const { count: aiCount, error: aiErr } = await supabase
+      .from('ai_investigations')
+      .select('id', { count: 'exact', head: true });
+    if (aiErr) throw aiErr;
+
+    const totalRuns = runs?.length || 0;
+    const totalRecords = runs?.reduce((acc, r) => acc + (r.total_records || 0), 0) || 0;
+    const totalMatched = runs?.reduce((acc, r) => acc + (r.matched_count || 0), 0) || 0;
+    const totalExceptions = exceptions?.length || 0;
+
+    const exceptionsByCategory = (exceptions || []).reduce((acc, e) => {
+      acc[e.category] = (acc[e.category] || 0) + 1;
+      return acc;
+    }, {});
+
+    const aiExplained = (exceptions || []).filter(e => e.ai_investigation_status === 'COMPLETED').length;
+    const unresolved = (exceptions || []).filter(e => e.status === 'UNRESOLVED').length;
+
+    const latestRun = runs?.[0] || null;
+
+    return res.json({
+      success: true,
+      data: {
+        totalRuns,
+        totalRecords,
+        totalMatched,
+        totalExceptions,
+        aiExplained,
+        unresolved,
+        aiInvestigationsCount: aiCount || 0,
+        overallMatchRate: totalRecords > 0
+          ? Math.round((totalMatched / totalRecords) * 100)
+          : 0,
+        exceptionsByCategory,
+        latestRun,
+        recentRuns: (runs || []).slice(0, 5)
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
+

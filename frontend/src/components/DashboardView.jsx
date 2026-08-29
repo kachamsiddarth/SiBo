@@ -21,6 +21,7 @@ import {
 export function DashboardView({ health, onNavigate }) {
   const [runs, setRuns] = useState([]);
   const [exceptions, setExceptions] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,16 +31,19 @@ export function DashboardView({ health, onNavigate }) {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [runsRes, excRes] = await Promise.all([
+      const [runsRes, excRes, summaryRes] = await Promise.all([
         fetch('/api/upload/runs'),
-        fetch('/api/exceptions')
+        fetch('/api/exceptions'),
+        fetch('/api/dashboard/summary')
       ]);
 
       const runsData = await runsRes.json();
       const excData = await excRes.json();
+      const summaryData = await summaryRes.json();
 
       if (runsData.success) setRuns(runsData.data || []);
       if (excData.success) setExceptions(excData.data || []);
+      if (summaryData.success) setSummary(summaryData.data);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
@@ -48,9 +52,11 @@ export function DashboardView({ health, onNavigate }) {
   };
 
   const latestRun = runs.length > 0 ? runs[0] : null;
-  const totalProcessed = runs.reduce((acc, r) => acc + (r.total_records || 0), 0);
-  const totalExceptions = exceptions.length;
-  const explainedExceptions = exceptions.filter(e => e.ai_investigation_status === 'COMPLETED').length;
+  const totalProcessed = summary?.totalRecords ?? runs.reduce((acc, r) => acc + (r.total_records || 0), 0);
+  const totalExceptions = summary?.totalExceptions ?? exceptions.length;
+  const explainedExceptions = summary?.aiExplained ?? exceptions.filter(e => e.ai_investigation_status === 'COMPLETED').length;
+  const overallMatchRate = summary?.overallMatchRate ?? (latestRun?.match_rate || 0);
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -137,11 +143,11 @@ export function DashboardView({ health, onNavigate }) {
             </div>
 
             <div className="neo-card" style={{ background: '#1e293b' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Latest Match Rate</div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Overall Match Rate</div>
               <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary-green)', marginTop: '4px' }}>
-                {latestRun?.match_rate ? `${latestRun.match_rate}%` : 'N/A'}
+                {overallMatchRate}%
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Latest Run: {latestRun?.file_name || 'N/A'}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Across all {runs.length} run(s)</div>
             </div>
 
             <div className="neo-card" style={{ background: '#1e293b' }}>
