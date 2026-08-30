@@ -181,7 +181,7 @@ async function generateEvaluationDataset() {
           try {
             const parsed = typeof settlement.metadata === 'string' ? JSON.parse(settlement.metadata) : settlement.metadata;
             metaScenario = parsed.scenario;
-          } catch (e) {}
+          } catch (e) { }
         }
 
         if (metaScenario === 'amount_mismatch') {

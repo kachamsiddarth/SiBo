@@ -158,8 +158,8 @@ async function runPhase10Evaluation() {
 runPhase10Evaluation()
   .then(results => {
     const allPassed = results.suites.reconciliation.passed &&
-                      results.suites.rag.passed &&
-                      results.suites.ai.passed;
+      results.suites.rag.passed &&
+      results.suites.ai.passed;
     process.exit(allPassed ? 0 : 1);
   })
   .catch(error => {
