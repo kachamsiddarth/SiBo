@@ -17,14 +17,14 @@ export function ReconcileView({ onNavigate }) {
     setValidationSummary(null);
 
     try {
-      // Generate synthetic payments and settlements matching Phase 4 schema and scenarios
+      // Generate synthetic dataset matching Phase 4 schema and scenarios
       const paymentColumns = ['transaction_id', 'payment_amount', 'payment_date', 'payment_method', 'status', 'metadata'];
       const settlementColumns = ['settlement_id', 'transaction_id', 'payment_amount', 'fee', 'tax', 'adjustment', 'refund', 'settlement_amount', 'settlement_date', 'metadata'];
 
       const payments = [];
       const settlements = [];
 
-      for (let i = 1; i <= 20; i++) {
+      for (let i = 1; i <= 60; i++) {
         const txId = `TXN${String(i).padStart(6, '0')}`;
         const stlId = `STL${String(i).padStart(6, '0')}`;
         const pAmt = (1000 + i * 150).toFixed(2);
@@ -39,7 +39,7 @@ export function ReconcileView({ onNavigate }) {
         payments.push({
           transaction_id: txId,
           payment_amount: pAmt,
-          payment_date: '2026-08-28T10:00:00.000Z',
+          payment_date: '2026-08-28',
           payment_method: i % 2 === 0 ? 'CARD' : 'UPI',
           status: 'captured',
           metadata: JSON.stringify({ batch: 'synthetic' })
@@ -61,7 +61,16 @@ export function ReconcileView({ onNavigate }) {
         }
       }
 
-      const toCsv = (arr, cols) => [cols.join(','), ...arr.map(r => cols.map(c => `"${r[c]}"`).join(','))].join('\n');
+      const toCsv = (arr, cols) => [
+        cols.join(','), 
+        ...arr.map(r => cols.map(c => {
+          const val = String(r[c] || '');
+          if (val.includes('"') || val.includes(',') || val.includes('\n')) {
+            return `"${val.replace(/"/g, '""')}"`;
+          }
+          return val;
+        }).join(','))
+      ].join('\n');
       const paymentCsv = toCsv(payments, paymentColumns);
       const settlementCsv = toCsv(settlements, settlementColumns);
 
@@ -245,11 +254,15 @@ export function ReconcileView({ onNavigate }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', background: '#0f172a', padding: '16px', borderRadius: 'var(--radius-sm)', border: '2px solid #334155' }}>
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>PAYMENTS INGESTED</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>{validationSummary.paymentsIngested}</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>
+                {validationSummary.paymentFile?.validRows ?? validationSummary.paymentsIngested ?? 0}
+              </div>
             </div>
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>SETTLEMENTS INGESTED</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>{validationSummary.settlementsIngested}</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>
+                {validationSummary.settlementFile?.validRows ?? validationSummary.settlementsIngested ?? 0}
+              </div>
             </div>
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>SCHEMA STATUS</div>

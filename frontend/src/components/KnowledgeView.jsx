@@ -18,8 +18,11 @@ export function KnowledgeView() {
         body: JSON.stringify({ query: query.trim(), topK: 5, matchThreshold: 0.15 })
       });
       const data = await res.json();
-      if (data.results) {
+      if (res.ok && data.results) {
         setSearchResults(data.results || []);
+      } else {
+        console.error('RAG Search returned error:', data);
+        setSearchResults([]);
       }
     } catch (err) {
       console.error('RAG Search failed:', err);
