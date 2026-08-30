@@ -316,6 +316,9 @@ export async function runDeterministicReconciliation(runId) {
   };
 }
 
+// Compatibility alias for Phase 10 evaluator
+export const reconcile = runDeterministicReconciliation;
+
 export default {
   normalizeMoney,
   runDeterministicReconciliation

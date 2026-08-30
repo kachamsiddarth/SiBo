@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-08-30T12:32:07.997Z",
+  "runId": "ca6aa7de-9ebd-4ccf-875d-9023c609ddd3",
+  "datasetSize": 100,
+  "scenarios": {
+    "MATCHED": {
+      "count": 60,
+      "expectedStatus": "MATCHED",
+      "expectedExceptionType": null
+    },
+    "AMOUNT_MISMATCH": {
+      "count": 15,
+      "expectedStatus": "EXCEPTION",
+      "expectedExceptionType": "AMOUNT_MISMATCH"
+    },
+    "MISSING_SETTLEMENT": {
+      "count": 10,
+      "expectedStatus": "EXCEPTION",
+      "expectedExceptionType": "MISSING_SETTLEMENT"
+    },
+    "DUPLICATE_TRANSACTION": {
+      "count": 5,
+      "expectedStatus": "EXCEPTION",
+      "expectedExceptionType": "DUPLICATE_TRANSACTION"
+    },
+    "COMPONENT_MISMATCH": {
+      "count": 5,
+      "expectedStatus": "EXCEPTION",
+      "expectedExceptionType": "COMPONENT_MISMATCH"
+    },
+    "UNEXPLAINED_DIFFERENCE": {
+      "count": 5,
+      "expectedStatus": "EXCEPTION",
+      "expectedExceptionType": "UNEXPLAINED_DIFFERENCE"
+    }
+  },
+  "metrics": {
+    "overview": {
+      "totalRecords": 100,
+      "expectedMatches": 65,
+      "expectedExceptions": 35,
+      "processingTimeMs": 1337,
+      "throughputRecordsPerSecond": 74.79
+    },
+    "accuracy": {
+      "correctlyMatched": 65,
+      "correctlyDetectedExceptions": 35,
+      "falseMatches": 0,
+      "missedExceptions": 0,
+      "overallAccuracy": "100.00%",
+      "precision": "100.00%",
+      "recall": "100.00%",
+      "f1Score": "100.00%"
+    },
+    "exceptionTypeAccuracy": {
+      "correctExceptionTypes": 35,
+      "incorrectExceptionTypes": 0,
+      "typeAccuracy": "100.00%"
+    }
+  }
+}

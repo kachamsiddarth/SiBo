@@ -1,0 +1,243 @@
+{
+  "timestamp": "2026-08-30T12:32:24.666Z",
+  "evaluationQuestions": [
+    {
+      "question": "What is a settlement in the context of payment processing?",
+      "expectedSource": "01-about-settlements.md",
+      "expectedSection": "About Settlements",
+      "expectedConcepts": [
+        "settlement",
+        "payment processing",
+        "transaction batch"
+      ]
+    },
+    {
+      "question": "What components make up a settlement amount?",
+      "expectedSource": "02-settlement-breakup.md",
+      "expectedSection": "Settlement Breakup",
+      "expectedConcepts": [
+        "payment amount",
+        "fee",
+        "tax",
+        "adjustment",
+        "refund",
+        "settlement amount"
+      ]
+    },
+    {
+      "question": "How can settlement data be retrieved programmatically?",
+      "expectedSource": "03-settlement-apis.md",
+      "expectedSection": "Settlement APIs",
+      "expectedConcepts": [
+        "API",
+        "endpoint",
+        "HTTP",
+        "GET",
+        "settlement data"
+      ]
+    },
+    {
+      "question": "What are the key fields in the settlement API response?",
+      "expectedSource": "04-settlement-api-reference.md",
+      "expectedSection": "API Reference",
+      "expectedConcepts": [
+        "settlement_id",
+        "transaction_id",
+        "payment_amount",
+        "fee",
+        "tax",
+        "settlement_amount"
+      ]
+    },
+    {
+      "question": "What happens when a settlement fails to process?",
+      "expectedSource": "05-settlement-faqs.md",
+      "expectedSection": "FAQs",
+      "expectedConcepts": [
+        "failed settlement",
+        "retry",
+        "error handling",
+        "settlement failure"
+      ]
+    },
+    {
+      "question": "What details are included in a settlement details report?",
+      "expectedSource": "06-settlement-details.md",
+      "expectedSection": "Settlement Details",
+      "expectedConcepts": [
+        "detailed breakdown",
+        "component fees",
+        "taxes",
+        "net amount",
+        "processing date"
+      ]
+    },
+    {
+      "question": "How are fees calculated in Razorpay settlements?",
+      "expectedSource": "02-settlement-breakup.md",
+      "expectedSection": "Fees",
+      "expectedConcepts": [
+        "fee calculation",
+        "transaction volume",
+        "percentage",
+        "fixed fee"
+      ]
+    },
+    {
+      "question": "What tax components are included in settlements?",
+      "expectedSource": "02-settlement-breakup.md",
+      "expectedSection": "Taxes",
+      "expectedConcepts": [
+        "GST",
+        "tax components",
+        "tax calculation",
+        "government taxes"
+      ]
+    },
+    {
+      "question": "What adjustments can affect settlement amounts?",
+      "expectedSource": "02-settlement-breakup.md",
+      "expectedSection": "Adjustments",
+      "expectedConcepts": [
+        "adjustments",
+        "refunds",
+        "chargebacks",
+        "disputes",
+        "settlement amount"
+      ]
+    },
+    {
+      "question": "How long does it take for settlements to be processed?",
+      "expectedSource": "01-about-settlements.md",
+      "expectedSection": "Settlement Cycle",
+      "expectedConcepts": [
+        "T+2",
+        "settlement cycle",
+        "processing time",
+        "business days"
+      ]
+    }
+  ],
+  "metrics": {
+    "overview": {
+      "totalQuestions": 10,
+      "questionsWithResults": 10,
+      "successRate": "100.00%"
+    },
+    "retrievalQuality": {
+      "recallAt1": "50.00%",
+      "recallAt3": "20.00%",
+      "recallAt5": "20.00%",
+      "meanReciprocalRank": "0.5833"
+    },
+    "sourceAccuracy": {
+      "sourceRelevance": "70.00%",
+      "exactSourceMatch": "50.00%"
+    },
+    "contentRelevance": {
+      "sectionAccuracy": "0.00%",
+      "conceptAccuracy": "50.00%"
+    },
+    "failureAnalysis": {
+      "failedQuestions": 3,
+      "failedQuestionDetails": [
+        {
+          "index": 3,
+          "question": "What are the key fields in the settlement API response?",
+          "reason": "Expected source '04-settlement-api-reference.md' not found in results",
+          "results": [
+            {
+              "source": "02-settlement-breakup.md",
+              "section": "View Settlements Using API",
+              "similarity": 0.7487
+            },
+            {
+              "source": "02-settlement-breakup.md",
+              "section": "Related Information",
+              "similarity": 0.7444
+            },
+            {
+              "source": "03-settlement-apis.md",
+              "section": "List of Settlements API",
+              "similarity": 0.7435
+            },
+            {
+              "source": "03-settlement-apis.md",
+              "section": "General",
+              "similarity": 0.7334
+            },
+            {
+              "source": "03-settlement-apis.md",
+              "section": "General",
+              "similarity": 0.7321
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "question": "What happens when a settlement fails to process?",
+          "reason": "Expected source '05-settlement-faqs.md' not found in results",
+          "results": [
+            {
+              "source": "01-about-settlements.md",
+              "section": "Settlement States",
+              "similarity": 0.7394
+            },
+            {
+              "source": "02-settlement-breakup.md",
+              "section": "View Channel-Wise Settlements",
+              "similarity": 0.6763
+            },
+            {
+              "source": "02-settlement-breakup.md",
+              "section": "Enable Settlements Placed On Hold",
+              "similarity": 0.6697
+            },
+            {
+              "source": "06-settlement-details.md",
+              "section": "How Segregated Settlements Work",
+              "similarity": 0.6479
+            },
+            {
+              "source": "04-settlement-api-reference.md",
+              "section": "Related Guides",
+              "similarity": 0.6474
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "question": "What details are included in a settlement details report?",
+          "reason": "Expected source '06-settlement-details.md' not found in results",
+          "results": [
+            {
+              "source": "02-settlement-breakup.md",
+              "section": "General",
+              "similarity": 0.7372
+            },
+            {
+              "source": "02-settlement-breakup.md",
+              "section": "Settlements Break-Up Description",
+              "similarity": 0.7345
+            },
+            {
+              "source": "04-settlement-api-reference.md",
+              "section": "Related Guides",
+              "similarity": 0.7241
+            },
+            {
+              "source": "05-settlement-faqs.md",
+              "section": "Related Guides",
+              "similarity": 0.7241
+            },
+            {
+              "source": "02-settlement-breakup.md",
+              "section": "Reports",
+              "similarity": 0.7166
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
