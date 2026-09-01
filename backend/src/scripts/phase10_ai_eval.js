@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * Known exception scenarios with expected investigation outcomes
  */
+
 const EXCEPTION_SCENARIOS = [
   {
     name: 'Simple Amount Mismatch',
