@@ -1,6 +1,8 @@
 import express from 'express';
 import multer from 'multer';
 import { csvProcessor } from '../services/csvProcessor.js';
+import { uploadLimiter } from '../middleware/rateLimiter.js';
+import { validateRunId } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -37,8 +39,9 @@ const upload = multer({
  * @route   POST /api/upload
  * @desc    Upload and validate payment/settlement CSV files
  * @access  Public
+ * @ratelimit 5 uploads per 15 minutes
  */
-router.post('/upload', upload.fields([
+router.post('/upload', uploadLimiter, upload.fields([
   { name: 'paymentFile', maxCount: 1 },
   { name: 'settlementFile', maxCount: 1 }
 ]), async (req, res, next) => {
@@ -270,7 +273,7 @@ router.get('/upload/runs', async (req, res, next) => {
  * @desc    Get details of a specific reconciliation run
  * @access  Public
  */
-router.get('/upload/runs/:runId', async (req, res, next) => {
+router.get('/upload/runs/:runId', validateRunId, async (req, res, next) => {
   try {
     const { runId } = req.params;
     const { supabase } = await import('../config/supabase.js');

@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-30T12:32:07.997Z",
-  "runId": "ca6aa7de-9ebd-4ccf-875d-9023c609ddd3",
+  "timestamp": "2026-09-01T19:42:47.266Z",
+  "runId": "25825917-9bd8-495d-b94b-e192cf7f6033",
   "datasetSize": 100,
   "scenarios": {
     "MATCHED": {
@@ -39,8 +39,8 @@
       "totalRecords": 100,
       "expectedMatches": 65,
       "expectedExceptions": 35,
-      "processingTimeMs": 1337,
-      "throughputRecordsPerSecond": 74.79
+      "processingTimeMs": 1639,
+      "throughputRecordsPerSecond": 61.01
     },
     "accuracy": {
       "correctlyMatched": 65,

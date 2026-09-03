@@ -1,6 +1,8 @@
 import express from 'express';
 import { runDeterministicReconciliation } from '../services/reconciliationEngine.js';
 import { supabase } from '../config/supabase.js';
+import { reconciliationLimiter } from '../middleware/rateLimiter.js';
+import { validateRunId, validateExceptionId } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -8,16 +10,11 @@ const router = express.Router();
  * @route   POST /api/reconciliation/run/:runId
  * @desc    Execute deterministic reconciliation engine for a specific run ID
  * @access  Public
+ * @ratelimit 3 requests per 15 minutes per run
  */
-router.post('/reconciliation/run/:runId', async (req, res, next) => {
+router.post('/reconciliation/run/:runId', reconciliationLimiter, validateRunId, async (req, res, next) => {
   try {
     const { runId } = req.params;
-    if (!runId) {
-      return res.status(400).json({
-        success: false,
-        error: { code: 'INVALID_RUN_ID', message: 'runId parameter is required.' }
-      });
-    }
 
     console.log(`⚡ Executing deterministic reconciliation engine for run: ${runId}...`);
     const summary = await runDeterministicReconciliation(runId);
@@ -38,7 +35,7 @@ router.post('/reconciliation/run/:runId', async (req, res, next) => {
  * @desc    Get reconciliation results for a specific run ID
  * @access  Public
  */
-router.get('/reconciliation/results/:runId', async (req, res, next) => {
+router.get('/reconciliation/results/:runId', validateRunId, async (req, res, next) => {
   try {
     const { runId } = req.params;
     const { status, exception_type } = req.query;
@@ -99,7 +96,7 @@ router.get('/exceptions', async (req, res, next) => {
  * @desc    Get details for a specific exception record
  * @access  Public
  */
-router.get('/exceptions/:exceptionId', async (req, res, next) => {
+router.get('/exceptions/:exceptionId', validateExceptionId, async (req, res, next) => {
   try {
     const { exceptionId } = req.params;
 

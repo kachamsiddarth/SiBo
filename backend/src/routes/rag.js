@@ -2,6 +2,7 @@ import express from 'express';
 import { searchRagKnowledge } from '../rag/retriever/ragRetriever.js';
 import { runRagIngestion } from '../rag/ingestion/ingestPipeline.js';
 import { supabase } from '../config/supabase.js';
+import { ragLimiter, ingestionLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -9,8 +10,9 @@ const router = express.Router();
  * @route   POST /api/rag/search
  * @desc    Execute semantic vector retrieval against Razorpay domain knowledge
  * @access  Public
+ * @ratelimit 10 requests per 5 minutes
  */
-router.post('/rag/search', async (req, res, next) => {
+router.post('/rag/search', ragLimiter, async (req, res, next) => {
   try {
     const { query, topK, matchThreshold } = req.body;
 
@@ -40,8 +42,9 @@ router.post('/rag/search', async (req, res, next) => {
  * @route   POST /api/rag/ingest
  * @desc    Trigger RAG document ingestion pipeline
  * @access  Public
+ * @ratelimit 2 requests per hour
  */
-router.post('/rag/ingest', async (req, res, next) => {
+router.post('/rag/ingest', ingestionLimiter, async (req, res, next) => {
   try {
     const { forceReingest } = req.body || {};
     const summary = await runRagIngestion({ forceReingest: !!forceReingest });

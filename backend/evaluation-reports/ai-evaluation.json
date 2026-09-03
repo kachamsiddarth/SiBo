@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-30T12:33:43.973Z",
-  "runId": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
+  "timestamp": "2026-09-01T19:46:12.061Z",
+  "runId": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
   "scenarios": [
     {
       "name": "Simple Amount Mismatch",
@@ -47,7 +47,7 @@
       "correctEvidence": "100.00%",
       "correctRAGUsage": "100.00%",
       "hallucinationFree": "100.00%",
-      "appropriateConfidence": "100.00%",
+      "appropriateConfidence": "50.00%",
       "appropriateRecommendation": "100.00%",
       "correctUnresolvedBehavior": "75.00%"
     },
@@ -55,69 +55,33 @@
       {
         "scenario": "Simple Amount Mismatch",
         "exception": {
-          "id": "7a28f314-46a5-4760-b40f-af6abbb0001c",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "reconciliation_result_id": "14e864d5-29cf-4269-95f9-03933d05f635",
+          "id": "352df87a-ff84-41d5-812c-cd35ec5cd1b0",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "reconciliation_result_id": "1edd7ac6-bc36-48c2-af6c-ceea8a4b945c",
           "transaction_id": "TXN000002",
           "category": "MISSING_SETTLEMENT",
           "difference": 26693,
           "status": "UNRESOLVED",
           "ai_investigation_status": "PENDING",
-          "created_at": "2026-08-30T12:32:27.578867+00:00",
-          "updated_at": "2026-08-30T12:32:27.578867+00:00"
+          "created_at": "2026-09-01T19:44:10.524229+00:00",
+          "updated_at": "2026-09-01T19:44:10.524229+00:00"
         },
         "investigation": {
-          "id": "d1333164-16e6-4bc8-8af0-cc20b606b808",
-          "exception_id": "7a28f314-46a5-4760-b40f-af6abbb0001c",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "summary": "The reconciliation engine flagged a component mismatch for TXN000002 due to inconsistent settlement components, but the reported discrepancy amount (26693) cannot be explained with the provided records.",
+          "id": "542c7a95-1459-4f60-aad9-7d0927ebaadb",
+          "exception_id": "352df87a-ff84-41d5-812c-cd35ec5cd1b0",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "summary": "The exception is caused by an over‑settlement entry for TXN000002 where the settlement amount (1319.32) does not deduct the applicable fee (26) and tax (4.68), resulting in a -50 discrepancy versus the expected settlement (1269.32).",
           "evidence": [
-            "Payment record shows a single captured CARD payment of 1300 on 2026-08-28.",
-            "Settlement records contain multiple entries for the same transaction, some with payment_amount 1300 (fee 26, tax 4.68) and others with payment_amount 22419 (fee 624, tax 147, adjustment 97).",
-            "Deterministic reconciliation result expects settlement 1269.32 but finds actual settlement 1319.32, a difference of -50, classified as COMPONENT_MISMATCH.",
-            "Evidence details claim \"No settlement record found for transaction\" with payment_amount 26693 and payment_method EMI, which does not match any of the supplied records."
+            "Exception ID: 352df87a-ff84-41d5-812c-cd35ec5cd1b0",
+            "Transaction ID: TXN000002",
+            "Payment Record shows payment_amount 1300, fee 26, tax 4.68, status captured",
+            "Settlement Record #1 (id 21ea026d-877c-423b-ac73-2d7a9162b64a) has settlement_amount 1319.32 for the same payment_amount 1300",
+            "Settlement Record #6 (id f607b84f-3c38-46c5-b241-e602dfb2a03b) correctly reflects settlement_amount 1269.32 (1300‑26‑4.68)",
+            "Deterministic Rec Result expects settlement 1269.32 but finds actual 1319.32, difference -50, flagged as COMPONENT_MISMATCH",
+            "Evidence Details mention a unrelated payment of 26693 on 2025‑01‑30 (EMI), which does not match the current transaction data"
           ],
-          "reasoning": "According to Razorpay’s settlement policy, a captured payment should settle after the standard T+2 cycle (Domestic Settlements) unless Instant Settlements are enabled. The payment of 1300 captured on 2026-08-28 should therefore settle on 2026-08-30, which aligns with the settlement record dated 2026-08-29 (accounting for time‑zone rounding). However, the dataset contains several synthetic settlement entries for the same transaction with a much larger payment_amount (22419) and identical fee/tax components. These duplicate synthetic records cause the deterministic engine to compute an unexpected settlement amount (1319.32) that differs from the calculated expected amount (1269.32) by -50, triggering a COMPONENT_MISMATCH exception. The reported discrepancy amount of 26693 does not correspond to any payment_amount in the provided records, and the \"No settlement record found\" note references an EMI payment that is absent from the data. Consequently, the root cause of the 26693 discrepancy cannot be determined from the available evidence.",
-          "recommended_action": "Perform a manual audit of transaction TXN000002: verify whether the synthetic settlement entries (payment_amount 22419) are erroneous duplicates, remove or correct them, and confirm the correct settlement amount for the 1300 payment. If an EMI payment of 26693 exists, locate its corresponding payment and settlement records in the source system and reconcile them separately.",
-          "confidence": "medium",
-          "status": "MANUAL_REVIEW",
-          "sources_used": [
-            {
-              "url": "https://razorpay-881012b3.mintlify.site/llms.txt",
-              "title": "Razorpay Settlement Documentation"
-            }
-          ],
-          "created_at": "2026-08-30T12:32:31.634645+00:00"
-        }
-      },
-      {
-        "scenario": "Missing Settlement",
-        "exception": {
-          "id": "142c8814-1009-4066-a19b-86a91d5dd90c",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "reconciliation_result_id": "2c5ad0ca-650d-4da7-9353-b3e5c2345be6",
-          "transaction_id": "TXN000006",
-          "category": "AMOUNT_MISMATCH",
-          "difference": -58,
-          "status": "UNRESOLVED",
-          "ai_investigation_status": "PENDING",
-          "created_at": "2026-08-30T12:32:27.578867+00:00",
-          "updated_at": "2026-08-30T12:32:27.578867+00:00"
-        },
-        "investigation": {
-          "id": "fdd13be8-d9ac-493e-840f-6a641561ddff",
-          "exception_id": "142c8814-1009-4066-a19b-86a91d5dd90c",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "summary": "The -58 amount mismatch is caused by an erroneous settlement record (STL000005) where the settlement amount (2221) does not follow Razorpay's settlement break‑up rules, resulting in a net higher than the payment amount.",
-          "evidence": [
-            "Exception ID 142c8814-1009-4066-a19b-86a91d5dd90c flagged as AMOUNT_MISMATCH with discrepancy -58.",
-            "Payment record shows payment_amount 35597, fee 712, tax 128, settlement_amount 34757 – all correctly matched (deterministic result MATCHED).",
-            "Settlement records include several entries for STL000005 with payment_amount 2215, fee 44, tax 8, but settlement_amount recorded as 2221.",
-            "Evidence Details calculate expected settlement as 2163 (2215 - 44 - 8) but actual settlement is 2221, yielding a difference of -58.",
-            "Razorpay documentation (Settlements Break‑Up Description) states settlement amount = payment – fee – tax – adjustment + refunds; it must never exceed the original payment amount."
-          ],
-          "reasoning": "The deterministic reconciliation engine correctly matches the primary transaction (35597) against its settlement (34757). However, an additional settlement entry (STL000005) for the same transaction uses a payment_amount of 2215 with fee 44 and tax 8, yet records a settlement_amount of 2221. According to the official Razorpay settlement break‑up rules, the settlement amount should be calculated as payment_amount minus fee, tax, and any adjustments (2215 - 44 - 8 = 2163). The recorded settlement_amount is 58 rupees higher than the expected value, violating the rule that settlement amounts cannot exceed the original payment. This mis‑calculation creates the -58 discrepancy reported by the exception engine. The mismatch is therefore a data integrity issue in the settlement record, not a legitimate partial‑settlement scenario, because partial settlements still adhere to the same deduction logic and would never produce a net greater than the payment amount.",
-          "recommended_action": "Investigate and correct the STL000005 settlement records: recalculate settlement_amount as 2163 (payment 2215 minus fee 44 minus tax 8) and update the database. If the records were generated by an automated batch, review the batch logic for rounding or sign errors and redeploy the corrected process. Re‑run the reconciliation after fixing to ensure the exception clears.",
+          "reasoning": "According to Razorpay settlement rules, the amount credited to the merchant is the captured payment amount minus applicable fees and taxes (see the \"Domestic Settlements\" documentation which describes the settlement cycle and implies that settlement amounts are net of fees). The payment record for TXN000002 indicates a fee of 26 and tax of 4.68, so the correct net settlement should be 1300 ‑ 26 ‑ 4.68 = 1269.32. The deterministic reconciliation engine correctly calculates this expected value. However, one of the settlement entries (id 21ea026d‑877c‑423b‑ac73‑2d7a9162b64a) records a settlement_amount of 1319.32, which is exactly 50 higher than the net amount, meaning the fee and tax were not deducted. This mismatch triggers the COMPONENT_MISMATCH exception with a -50 difference. The large synthetic settlement records (payment_amount 22419) and the unrelated evidence detail (payment_amount 26693) are noise and do not affect the net calculation for this transaction.",
+          "recommended_action": "Investigate the settlement entry with settlement_amount 1319.32 for TXN000002, correct the fee/tax deduction, and if the excess 50 has already been transferred to the merchant, initiate a reversal or adjust future settlements to recover the amount. Also purge or ignore the synthetic duplicate settlement records to avoid future false positives.",
           "confidence": "high",
           "status": "EXPLAINED",
           "sources_used": [
@@ -126,39 +90,39 @@
               "title": "Razorpay Settlement Documentation"
             }
           ],
-          "created_at": "2026-08-30T12:32:37.09861+00:00"
+          "created_at": "2026-09-01T19:44:22.392069+00:00"
         }
       },
       {
-        "scenario": "Component Mismatch - Fees",
+        "scenario": "Missing Settlement",
         "exception": {
-          "id": "ba33b952-c9f8-4309-b7fa-d4ead28fce03",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "reconciliation_result_id": "d52c337e-c0a5-4a9d-94e5-c5470eeb7982",
-          "transaction_id": "TXN000008",
-          "category": "DUPLICATE_TRANSACTION",
-          "difference": -43143,
+          "id": "33cab6aa-f78d-4157-afcb-f34bd301ef89",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "reconciliation_result_id": "8084e670-90a8-4ffe-a86f-7eedf55174da",
+          "transaction_id": "TXN000006",
+          "category": "AMOUNT_MISMATCH",
+          "difference": -58,
           "status": "UNRESOLVED",
           "ai_investigation_status": "PENDING",
-          "created_at": "2026-08-30T12:32:27.578867+00:00",
-          "updated_at": "2026-08-30T12:32:27.578867+00:00"
+          "created_at": "2026-09-01T19:44:10.524229+00:00",
+          "updated_at": "2026-09-01T19:44:10.524229+00:00"
         },
         "investigation": {
-          "id": "84ee04fe-5290-4556-b9ae-1db8bbf11f1d",
-          "exception_id": "ba33b952-c9f8-4309-b7fa-d4ead28fce03",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "summary": "The exception is caused by duplicate settlement records (STL000007 and STL000008) for transaction TXN000008, leading the reconciliation engine to flag a DUPLICATE_TRANSACTION with a net discrepancy of -43143 despite the primary settlement matching the expected amount.",
+          "id": "19c9e95b-a352-4541-bf50-6296574a0b5f",
+          "exception_id": "33cab6aa-f78d-4157-afcb-f34bd301ef89",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "summary": "The exception is caused by a secondary settlement (STL000005) where the settlement amount was calculated incorrectly, resulting in a -58 amount mismatch.",
           "evidence": [
-            "Exception ID ba33b952-c9f8-4309-b7fa-d4ead28fce03 is categorized as DUPLICATE_TRANSACTION with discrepancy amount -43143.",
-            "Payment record shows a single authorized payment of 13,676 (UPI).",
-            "Deterministic reconciliation result reports a MATCHED status for the expected settlement of 13,439 (payment amount minus fee, tax, adjustment).",
-            "Settlement records contain multiple entries for the same transaction ID, including two duplicate settlements (STL000007 and STL000008) each with settlement_amount 44,212.",
-            "Evidence details explicitly state \"Found 2 duplicate settlement records for transaction\" and list the duplicate settlement IDs.",
-            "Official Razorpay documentation on Settlements APIs indicates that each settlement ID should be unique and represent a single settlement event; duplicate IDs for the same transaction are not expected."
+            "Exception ID: 33cab6aa-f78d-4157-afcb-f34bd301ef89",
+            "Transaction ID: TXN000006, Category: AMOUNT_MISMATCH, Discrepancy Amount: -58",
+            "Payment Record shows payment_amount 35597 (captured via WALLET) with expected settlement 34757 (matched by deterministic engine).",
+            "Settlement records include multiple entries; the ones with settlement_id STL000005 have payment_amount 2215, fee 44, tax 8, settlement_amount 2221.",
+            "Evidence Details: expected_settlement 2163 (payment 2215 – fee 44 – tax 8), actual_settlement 2221, difference -58.",
+            "Deterministic Rec Result confirms MATCHED for the primary settlement (STL000006) with no difference."
           ],
-          "reasoning": "According to Razorpay's settlement model, each transaction should map to a single settlement record (see Settlements APIs documentation). The operational data shows that TXN000008 has one correct settlement (STL000009) that matches the expected settlement amount (13,439). However, there are two additional settlement entries (STL000007 and STL000008) with the same settlement_amount (44,212) for the same transaction ID. These duplicate entries cause the aggregated settlement view to over‑state the total settled amount for the transaction. The reconciliation engine, while correctly matching the primary settlement, flags the presence of duplicate settlement records as a DUPLICATE_TRANSACTION exception and calculates a net discrepancy of -43,143, representing the erroneous double‑counted amount. This aligns with the engine's rule that duplicate settlement records constitute a reconciliation exception, even if the primary settlement matches.",
-          "recommended_action": "Investigate the source of the duplicate settlement entries (STL000007 and STL000008) – likely a data ingestion or API processing error – and purge or correct the duplicates in the settlement ledger. After cleanup, re‑run the reconciliation to ensure the exception resolves.",
-          "confidence": "medium",
+          "reasoning": "According to Razorpay’s official documentation (Settlements Break‑Up Description), the settlement amount is calculated as: **payment_amount – fee – tax – adjustment – refund**. For the STL000005 records the correct calculation should be 2215 – 44 – 8 = 2163. However, the recorded settlement_amount is 2221, which is 58 higher than the expected value. This violates the documented settlement break‑up rule, indicating that tax (or another component) was not deducted correctly for this partial settlement. The deterministic reconciliation engine only evaluated the primary settlement (STL000006) and therefore reported a match, but the exception engine flagged the secondary settlement where the rule breach occurred, resulting in the -58 discrepancy.",
+          "recommended_action": "Review and correct the STL000005 settlement entries: ensure tax is deducted (not added) and recompute the settlement_amount to 2163. After correction, re‑run the reconciliation for TXN000006. If the discrepancy persists, open a support ticket with Razorpay to investigate potential system‑level calculation bug for partial settlements.",
+          "confidence": "high",
           "status": "EXPLAINED",
           "sources_used": [
             {
@@ -166,46 +130,86 @@
               "title": "Razorpay Settlement Documentation"
             }
           ],
-          "created_at": "2026-08-30T12:33:31.816811+00:00"
+          "created_at": "2026-09-01T19:44:36.352237+00:00"
         }
       },
       {
-        "scenario": "Unexplained Large Difference",
+        "scenario": "Component Mismatch - Fees",
         "exception": {
-          "id": "f9f069bf-89c3-402b-b0db-5141e2e6cf79",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "reconciliation_result_id": "f53ac3de-089b-4ee5-bd72-ed6ed7b11ef1",
-          "transaction_id": "TXN000009",
-          "category": "UNEXPLAINED_DIFFERENCE",
-          "difference": 1552,
+          "id": "303c60c7-567d-49fe-b34f-b45c1e6d6ed4",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "reconciliation_result_id": "f5805ca2-3387-4d33-a55e-5187b6fa3aea",
+          "transaction_id": "TXN000008",
+          "category": "DUPLICATE_TRANSACTION",
+          "difference": -43143,
           "status": "UNRESOLVED",
           "ai_investigation_status": "PENDING",
-          "created_at": "2026-08-30T12:32:27.578867+00:00",
-          "updated_at": "2026-08-30T12:32:27.578867+00:00"
+          "created_at": "2026-09-01T19:44:10.524229+00:00",
+          "updated_at": "2026-09-01T19:44:10.524229+00:00"
         },
         "investigation": {
-          "id": "34db4228-6f9e-4a2b-b0f8-7ae6e5990af9",
-          "exception_id": "f9f069bf-89c3-402b-b0db-5141e2e6cf79",
-          "run_id": "d281d45d-12f7-434d-8d8c-0c1f25bf59c7",
-          "summary": "The 1552 discrepancy stems from a secondary settlement record (payment_amount = 33340) whose settlement_amount (31001) is lower than the expected amount (32553) calculated from payment‑fee‑tax, while the primary settlement matches correctly.",
+          "id": "9eff20bd-ae94-4e2f-a45a-8b0e0cabf502",
+          "exception_id": "303c60c7-567d-49fe-b34f-b45c1e6d6ed4",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "summary": "The exception is caused by duplicate settlement records for transaction TXN000008, resulting in a double‑counted settlement amount and the reported discrepancy of -43143.",
           "evidence": [
-            "Payment record shows a captured payment of 16900 with fee 338 and tax 61, resulting in a settled amount of 16501 (matched by the deterministic engine).",
-            "Multiple settlement records exist for TXN000009; the majority (settlement_id = STL000010) match the payment of 16900 and settle to 16501.",
-            "Three settlement records (ids 08bc3494-ef00-4565-bea2-8f735d12972e, 0626ea61-dafe-419f-9ff7-efa808cba8bd, 147c1b28-3a9b-4698-9292-39e8d6b0149a, 67c607e4-7bf6-4e2a-bbc4-9416bf794a73) have payment_amount = 33340, fee = 667, tax = 120, settlement_amount = 31001 and are tagged with \"scenario\":\"unexplained_difference\".",
-            "Evidence details calculate expected_settlement = 33340 – 667 – 120 = 32553, yielding a difference of 1552 (the flagged discrepancy).",
-            "Official Razorpay documentation defines settlement components (Payment, Fee, Tax, Adjustment, Refunds, Transfer) and notes that any missing component will affect the final settlement amount."
+            "Exception category is DUPLICATE_TRANSACTION with discrepancy amount -43143.",
+            "Payment record shows a single authorized payment of 13,676 INR (settlement amount 13,439 INR).",
+            "Deterministic reconciliation result reports a MATCHED status with expected and actual settlement both 13,439 INR.",
+            "Evidence details flag two duplicate settlement records (STL000007 and STL000008) each with settlement_amount 44,212 INR for the same transaction.",
+            "The settlement list contains multiple entries for TXN000008 across different run_ids, including the duplicate pair and several other identical records.",
+            "Razorpay Settlement APIs define each settlement by a unique settlement_id; a transaction should map to only one settlement entry."
           ],
-          "reasoning": "Razorpay settlements are derived by subtracting fee, tax, adjustments, refunds, and transfers from the gross payment amount (see *Settlements - Dashboard Actions*). For the primary settlement (payment = 16900) the engine correctly computes 16900 – 338 – 61 = 16501, resulting in a MATCHED status. However, a separate set of records for the same transaction reports a larger gross payment (33340) but settles only 31001. According to the same settlement formula, the expected settlement should be 33340 – 667 – 120 = 32553. The shortfall of 1552 indicates that an additional deduction (e.g., an adjustment, transfer, or unrecorded refund) is present but not captured in the record fields (adjustment = 0, refund = 0). Because the deterministic engine only evaluates the matched settlement set, it does not flag this secondary set, but the exception engine surfaces the 1552 difference based on the unexplained‑difference records. The root cause is therefore a mismatched or incomplete settlement entry for the same transaction, likely due to duplicate processing or a missing adjustment/transfer entry.",
-          "recommended_action": "Perform a manual audit of the settlement records tagged with \"unexplained_difference\" (IDs starting with 08bc3494, 0626ea61, 147c1b28, 67c607e4). Verify whether any adjustments, transfers, or refunds were applied off‑record for the 33340 payment. If an omission is confirmed, correct the settlement entry via Razorpay support or apply the missing adjustment manually, and ensure future runs de‑duplicate such records.",
-          "confidence": "medium",
-          "status": "MANUAL_REVIEW",
+          "reasoning": "According to Razorpay documentation, each transaction is settled once and identified by a unique settlement_id. The operational data shows that TXN000008 appears in two settlement records (STL000007 and STL000008) with identical settlement_amounts of 44,212 INR. These duplicates inflate the total settled amount for the transaction. The deterministic reconciliation engine correctly matches the original payment (13,676 INR) to its proper settlement (13,439 INR) and therefore reports no difference. However, the duplicate settlement entries are still present in the raw settlement table, and the reconciliation exception engine flags the transaction as a duplicate, calculating the discrepancy as the net effect of the extra settlement amount (approximately -43,143 INR). This mismatch is purely a data‑integrity issue—duplicate rows, not a calculation error—so the engine’s math remains correct while the underlying data is inconsistent.",
+          "recommended_action": "Run a data‑clean‑up job to remove the duplicate settlement records (STL000007 and STL000008) for TXN000008, ensure each transaction maps to a single settlement_id, and re‑run the reconciliation. If the duplicates were created by an upstream process, investigate and patch that process to prevent future duplicate settlements.",
+          "confidence": "high",
+          "status": "EXPLAINED",
           "sources_used": [
             {
               "url": "https://razorpay-881012b3.mintlify.site/llms.txt",
               "title": "Razorpay Settlement Documentation"
             }
           ],
-          "created_at": "2026-08-30T12:33:44.966368+00:00"
+          "created_at": "2026-09-01T19:45:38.446959+00:00"
+        }
+      },
+      {
+        "scenario": "Unexplained Large Difference",
+        "exception": {
+          "id": "8b0f4fad-93ca-46d4-985f-d46ae9971a48",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "reconciliation_result_id": "a04d489f-a568-43a8-9997-eba2fe97d2b9",
+          "transaction_id": "TXN000009",
+          "category": "UNEXPLAINED_DIFFERENCE",
+          "difference": 1552,
+          "status": "UNRESOLVED",
+          "ai_investigation_status": "PENDING",
+          "created_at": "2026-09-01T19:44:10.524229+00:00",
+          "updated_at": "2026-09-01T19:44:10.524229+00:00"
+        },
+        "investigation": {
+          "id": "b6c0906e-eb21-40d8-8284-6152169acb96",
+          "exception_id": "8b0f4fad-93ca-46d4-985f-d46ae9971a48",
+          "run_id": "59cb911f-e7ad-4d36-a5c7-930cb25219e5",
+          "summary": "The exception is caused by duplicate settlement records for TXN000009 with differing payment amounts, leading to an apparent 1552 discrepancy in the aggregated view.",
+          "evidence": [
+            "Payment record shows a single captured payment of 16900 INR.",
+            "Multiple settlement records exist for the same transaction ID, some with payment_amount 16900 (fee 338, tax 61, settlement_amount 16501) and others with payment_amount 33340 (fee 667, tax 120, settlement_amount 31001).",
+            "Deterministic reconciliation result for run_id 99c42961-c464-4674-8c7a-8cc1f16088c2 reports MATCHED with expected_settlement 16501 and actual_settlement 16501 (difference 0).",
+            "Evidence details flag a settlement discrepancy of 1552 for the larger payment_amount (33340) where expected_settlement 32553 vs actual_settlement 31001.",
+            "Metadata tags such as \"scenario\":\"unexplained_difference\" appear on the larger‑amount settlement records."
+          ],
+          "reasoning": "Razorpay settlements are composed of payment, fee, tax, adjustment, and refund components (see \"Settlements Break‑Up Description\" in the official documentation). The payment record for TXN000009 is 16900 INR, and the deterministic engine correctly matches this to settlement STL000010 (fee 338, tax 61, settlement_amount 16501). However, the dataset also contains a second set of settlement entries (STL000009) that attribute a payment_amount of 33340 INR to the same transaction, with proportionally higher fee and tax, resulting in an expected settlement of 32553 INR. The actual settlement recorded for these entries is 31001 INR, creating a shortfall of 1552 INR (32553‑31001). Because the reconciliation engine only evaluates the run that produced the matched record, it reports no difference, but the exception engine flags the presence of the conflicting settlement data as an \"UNEXPLAINED_DIFFERENCE\". This mismatch is a data integrity issue—duplicate or erroneous settlement entries for the same transaction—rather than a calculation error, and aligns with the documentation that each settlement must reflect a single payment amount and its associated deductions.",
+          "recommended_action": "Perform a data audit to identify the source of the duplicate settlement records (STL000009). Verify whether the larger payment_amount (33340) is a legitimate separate transaction or an erroneous duplicate. If erroneous, purge or correct the duplicate settlement entries and re‑run reconciliation. Document the root cause (e.g., integration bug, batch processing error) to prevent recurrence.",
+          "confidence": "high",
+          "status": "EXPLAINED",
+          "sources_used": [
+            {
+              "url": "https://razorpay-881012b3.mintlify.site/llms.txt",
+              "title": "Razorpay Settlement Documentation"
+            }
+          ],
+          "created_at": "2026-09-01T19:46:11.905878+00:00"
         }
       }
     ],
