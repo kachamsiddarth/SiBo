@@ -511,16 +511,4 @@ Clearly labeled as future work - not currently implemented:
 
 `<!-- INSERT DOCX DOCUMENTATION LINK HERE -->`
 
-## License
 
-License information can be added later. Please check repository for licensing details.
-
-## Credits / Team
-
-**SiBo Development Team:**
-- Backend Architecture & AI Engineering
-- Frontend Development & UI/UX Design
-- Database Design & DevOps
-- Quality Assurance & Testing
-
-Special thanks to the Razorpay Buildathon Track 04 organizers and mentors.
