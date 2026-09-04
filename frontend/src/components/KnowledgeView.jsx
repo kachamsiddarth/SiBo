@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Search, BookOpen, ExternalLink, RefreshCw, FileText, Database } from 'lucide-react';
 
 export function KnowledgeView() {
@@ -166,95 +167,19 @@ export function KnowledgeView() {
                     Similarity: {(match.similarity * 100).toFixed(1)}%
                   </span>
                 </div>
-                <p style={{
-                  fontSize: '0.9375rem',
-                  color: 'var(--sibo-text-secondary)',
-                  lineHeight: 1.7
-                }}>
+                <ReactMarkdown
+                  style={{
+                    fontSize: '0.9375rem',
+                    color: 'var(--sibo-text-secondary)',
+                    lineHeight: 1.7
+                  }}
+                >
                   {match.content}
-                </p>
+                </ReactMarkdown>
               </div>
             ))}
           </div>
         )}
-      </div>
-
-      {/* Indexed Sources */}
-      <div className="card" style={{ padding: 'var(--sibo-space-xl)' }}>
-        <h3 style={{
-          fontSize: '1.125rem',
-          fontWeight: 800,
-          color: 'var(--sibo-text-primary)',
-          marginBottom: 'var(--sibo-space-lg)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--sibo-space-sm)'
-        }}>
-          <BookOpen size={24} style={{ color: 'var(--sibo-warning)' }} />
-          Indexed Razorpay Documentation Sources
-        </h3>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 'var(--sibo-space-lg)'
-        }}>
-          {sources.map((file) => (
-            <div
-              key={file.id}
-              style={{
-                padding: 'var(--sibo-space-lg)',
-                borderRadius: 'var(--sibo-radius-md)',
-                background: 'var(--sibo-bg-surface-alt)',
-                border: '1px solid var(--sibo-border)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--sibo-space-sm)'
-              }}
-            >
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--sibo-space-xs)'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--sibo-space-sm)'
-                }}>
-                  <FileText size={20} style={{ color: 'var(--sibo-warning)' }} />
-                  <span style={{
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    color: 'var(--sibo-text-primary)'
-                  }}>
-                    {file.title}
-                  </span>
-                </div>
-                <span className="badge badge-info">
-                  {file.size}
-                </span>
-              </div>
-
-              <div style={{
-                fontSize: '0.8125rem',
-                color: 'var(--sibo-text-muted)',
-                fontFamily: 'var(--font-mono)'
-              }}>
-                {file.name}
-              </div>
-
-              <div style={{
-                fontSize: '0.875rem',
-                color: 'var(--sibo-info)',
-                fontWeight: 600
-              }}>
-                {file.section}
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
