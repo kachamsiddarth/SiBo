@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  UploadCloud, 
-  CheckCircle2, 
-  AlertTriangle, 
-  BookOpen, 
-  History, 
-  Activity,
-  Database
+import {
+  Home,
+  Upload,
+  BarChart3,
+  Sparkles,
+  BookOpen,
+  History,
+  Menu,
+  X,
+  Sun,
+  ChevronDown
 } from 'lucide-react';
 
 import { DashboardView } from './components/DashboardView.jsx';
@@ -18,10 +20,12 @@ import { ExceptionsView } from './components/ExceptionsView.jsx';
 import { ExceptionDetailView } from './components/ExceptionDetailView.jsx';
 import { KnowledgeView } from './components/KnowledgeView.jsx';
 import { HistoryView } from './components/HistoryView.jsx';
+import { LandingHero } from './components/LandingHero.jsx';
 
 export default function App() {
   const [backendHealth, setBackendHealth] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -40,102 +44,108 @@ export default function App() {
   }, []);
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/reconcile', label: 'Upload & Reconcile', icon: UploadCloud },
-    { path: '/results', label: 'Results', icon: CheckCircle2 },
-    { path: '/exceptions', label: 'Exceptions & AI', icon: AlertTriangle },
+    { path: '/dashboard', label: 'Dashboard', icon: Home },
+    { path: '/reconcile', label: 'Upload & Reconcile', icon: Upload },
+    { path: '/results', label: 'Results', icon: BarChart3 },
+    { path: '/exceptions', label: 'Exceptions & AI', icon: Sparkles },
     { path: '/knowledge', label: 'RAG Knowledge', icon: BookOpen },
     { path: '/history', label: 'Run History', icon: History },
   ];
 
+  const isActive = (path) => {
+    if (path === '/dashboard') {
+      return location.pathname === path || location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark)' }}>
-      {/* Top Navbar — Neobrutalist Style */}
-      <header style={{
-        background: '#0f172a',
-        borderBottom: '2px solid #334155',
-        padding: '16px 28px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            background: 'var(--primary-yellow)',
-            border: '2px solid #000',
-            boxShadow: '3px 3px 0px #000',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#000',
-            fontWeight: 900,
-            fontSize: '1.3rem'
-          }}>
-            Si
-          </div>
-          <div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.03em', color: '#fff' }}>
-              SiBo <span style={{ fontSize: '0.8rem', color: 'var(--primary-yellow)', fontWeight: 700, paddingLeft: '6px' }}>AI FINANCE CONTROLLER</span>
-            </h1>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Razorpay Settlement Domain Engine</p>
+    <div id="root">
+      {/* Clean Horizontal Navbar */}
+      <header>
+        <div className="container">
+          {/* Logo */}
+          <Link to="/" className="navbar-logo">
+            <div className="navbar-logo-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" />
+              </svg>
+            </div>
+            <div className="navbar-logo-text">
+              <strong>SiBo</strong>
+              <span>AI Finance Controller</span>
+            </div>
+          </Link>
+
+          {/* Center Navigation */}
+          <nav>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.path);
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={active ? 'active' : ''}
+                >
+                  <Icon size={16} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Right Side */}
+          <div className="navbar-right">
+            {/* Theme Toggle */}
+            <button className="theme-toggle-btn" aria-label="Toggle theme">
+              <Sun size={20} />
+            </button>
+
+            {/* User Profile */}
+            <div className="user-profile">
+              <div className="user-avatar">SK</div>
+              <span className="user-name">Siddharth K</span>
+              <ChevronDown size={16} className="user-chevron" />
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="mobile-menu-btn"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
 
-        {/* Navigation items */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 14px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: isActive ? '#000' : 'var(--text-main)',
-                  background: isActive ? 'var(--primary-yellow)' : '#1e293b',
-                  border: '2px solid #000',
-                  boxShadow: isActive ? '3px 3px 0px #000' : '2px 2px 0px #000',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                <Icon size={16} color={isActive ? '#000' : 'var(--text-main)'} />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Status indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span className={`badge ${backendHealth?.status === 'ok' ? 'badge-success' : 'badge-error'}`}>
-            <Activity size={12} style={{ marginRight: '4px' }} />
-            API: {loading ? 'CHECKING...' : backendHealth?.status === 'ok' ? 'ONLINE' : 'OFFLINE'}
-          </span>
-          <span className={`badge ${backendHealth?.services?.supabase === 'connected' ? 'badge-info' : 'badge-warning'}`}>
-            <Database size={12} style={{ marginRight: '4px' }} />
-            DB: {backendHealth?.services?.supabase || 'UNCONFIGURED'}
-          </span>
-        </div>
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <div className="mobile-nav">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.path);
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={active ? 'active' : ''}
+                >
+                  <Icon size={20} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </header>
 
-      {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '32px 28px', maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
+      {/* Main Content */}
+      <main>
         <Routes>
-          <Route path="/" element={<DashboardView health={backendHealth} onNavigate={navigate} />} />
+          <Route path="/" element={<LandingHero onNavigate={navigate} />} />
+          <Route path="/dashboard" element={<DashboardView health={backendHealth} onNavigate={navigate} />} />
           <Route path="/reconcile" element={<ReconcileView onNavigate={navigate} />} />
           <Route path="/results" element={<ResultsView onNavigate={navigate} />} />
           <Route path="/exceptions" element={<ExceptionsView onNavigate={navigate} />} />
@@ -144,22 +154,6 @@ export default function App() {
           <Route path="/history" element={<HistoryView onNavigate={navigate} />} />
         </Routes>
       </main>
-
-      {/* Footer */}
-      <footer style={{
-        borderTop: '2px solid #334155',
-        padding: '16px 28px',
-        fontSize: '0.8rem',
-        color: 'var(--text-muted)',
-        fontWeight: 600,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        background: '#0f172a'
-      }}>
-        <span>SiBo AI Finance Controller &copy; 2026 — Track 04 Buildathon</span>
-        <span>LLM: openai/gpt-oss-120b | Embeddings: Qwen3-0.6B (1024d)</span>
-      </footer>
     </div>
   );
 }

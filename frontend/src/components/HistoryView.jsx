@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { History as HistoryIcon, RefreshCw, ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { History as HistoryIcon, RefreshCw, ArrowRight, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react';
+import { formatNumber, formatPercent, formatDate } from '../utils/formatters.js';
 
 export function HistoryView({ onNavigate }) {
   const [runs, setRuns] = useState([]);
@@ -25,66 +26,148 @@ export function HistoryView({ onNavigate }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="page-content history-view" style={{ padding: 'var(--sibo-space-2xl) 2rem' }}>
+      {/* Page Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 'var(--sibo-space-2xl)',
+        flexWrap: 'wrap',
+        gap: 'var(--sibo-space-md)'
+      }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>
-            RECONCILIATION RUN HISTORY
-          </h2>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 500 }}>
-            Audit log of all past reconciliation dataset executions stored in Supabase.
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: 900,
+            color: 'var(--sibo-text-primary)',
+            marginBottom: 'var(--sibo-space-xs)'
+          }}>
+            Reconciliation Run History
+          </h1>
+          <p style={{
+            fontSize: '1rem',
+            color: 'var(--sibo-text-secondary)'
+          }}>
+            Audit log of all past reconciliation dataset executions stored in Supabase
           </p>
         </div>
-        <button onClick={fetchRuns} className="btn btn-secondary" style={{ padding: '8px 14px' }}>
-          <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh History
+
+        <button
+          onClick={fetchRuns}
+          className="btn btn-outline-secondary"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          <RefreshCw size={16} className={loading ? 'spin' : ''} />
+          <span>Refresh History</span>
         </button>
       </div>
 
       {loading ? (
-        <div style={{ padding: '48px', textAlign: 'center' }}>
-          <RefreshCw size={28} className="spin" color="var(--primary-yellow)" />
-          <p style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Loading run history from Supabase...</p>
+        <div style={{ padding: 'var(--sibo-space-3xl)', textAlign: 'center' }}>
+          <RefreshCw size={28} className="spin" style={{ color: 'var(--sibo-primary)' }} />
+          <p style={{ marginTop: 'var(--sibo-space-md)', color: 'var(--sibo-text-muted)' }}>
+            Loading run history from Supabase...
+          </p>
         </div>
       ) : runs.length === 0 ? (
-        <div className="neo-card" style={{ padding: '48px', textAlign: 'center', background: 'var(--bg-card-alt)' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', marginBottom: '8px' }}>NO RECONCILIATION RUNS YET</h3>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            No past reconciliation run records exist in the database.
+        /* Empty State */
+        <div className="card" style={{
+          padding: 'var(--sibo-space-3xl)',
+          textAlign: 'center',
+          maxWidth: '600px',
+          margin: '0 auto'
+        }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            background: 'var(--sibo-info-light)',
+            borderRadius: 'var(--sibo-radius-xl)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto var(--sibo-space-lg)'
+          }}>
+            <HistoryIcon size={40} style={{ color: 'var(--sibo-info)' }} />
+          </div>
+
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            color: 'var(--sibo-text-primary)',
+            marginBottom: 'var(--sibo-space-sm)'
+          }}>
+            No reconciliation runs yet
+          </h2>
+
+          <p style={{
+            fontSize: '1rem',
+            color: 'var(--sibo-text-secondary)',
+            lineHeight: 1.6
+          }}>
+            No past reconciliation run records exist in the database
           </p>
         </div>
       ) : (
-        <div className="neo-card" style={{ padding: '24px' }}>
+        <div className="card" style={{ padding: 'var(--sibo-space-lg)' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--sibo-space-sm)',
+            marginBottom: 'var(--sibo-space-lg)'
+          }}>
+            <Calendar size={20} style={{ color: 'var(--sibo-text-muted)' }} />
+            <span style={{
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--sibo-text-muted)'
+            }}>
+              {runs.length} reconciliation {runs.length === 1 ? 'run' : 'runs'} recorded
+            </span>
+          </div>
+
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+            <table>
               <thead>
-                <tr style={{ borderBottom: '2px solid #334155', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '12px 10px' }}>RUN ID</th>
-                  <th style={{ padding: '12px 10px' }}>FILE NAME</th>
-                  <th style={{ padding: '12px 10px' }}>TOTAL RECORDS</th>
-                  <th style={{ padding: '12px 10px' }}>MATCH RATE</th>
-                  <th style={{ padding: '12px 10px' }}>EXECUTION DATE</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'right' }}>ACTION</th>
+                <tr>
+                  <th>Run ID</th>
+                  <th>File Name</th>
+                  <th>Total Records</th>
+                  <th>Match Rate</th>
+                  <th>Execution Date</th>
+                  <th style={{ textAlign: 'right' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {runs.map((run) => (
-                  <tr key={run.id} style={{ borderBottom: '1px solid #334155' }}>
-                    <td style={{ padding: '12px 10px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{run.id.slice(0, 8)}...</td>
-                    <td style={{ padding: '12px 10px', fontWeight: 700 }}>{run.file_name}</td>
-                    <td style={{ padding: '12px 10px' }}>{run.total_records || 'N/A'}</td>
-                    <td style={{ padding: '12px 10px' }}>
-                      <span className="badge badge-success">{run.match_rate || 0}%</span>
+                  <tr key={run.id}>
+                    <td>
+                      <code className="font-mono" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                        {run.id.slice(0, 8)}...
+                      </code>
                     </td>
-                    <td style={{ padding: '12px 10px', color: 'var(--text-muted)' }}>
-                      {new Date(run.created_at).toLocaleString()}
+                    <td style={{ fontWeight: 700 }}>
+                      {run.file_name}
                     </td>
-                    <td style={{ padding: '12px 10px', textAlign: 'right' }}>
+                    <td style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                      {formatNumber(run.total_records || 0)}
+                    </td>
+                    <td>
+                      <span className={`badge ${run.match_rate >= 95 ? 'badge-success' : run.match_rate >= 80 ? 'badge-warning' : 'badge-error'}`}>
+                        {formatPercent(run.match_rate || 0)}
+                      </span>
+                    </td>
+                    <td style={{ color: 'var(--sibo-text-secondary)' }}>
+                      {formatDate(run.created_at)}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
                       <button
                         onClick={() => onNavigate('/results')}
-                        className="btn btn-secondary"
-                        style={{ padding: '6px 12px', fontSize: '0.75rem' }}
+                        className="btn btn-outline-secondary"
+                        style={{ padding: '0.375rem 0.875rem', fontSize: '0.8125rem' }}
                       >
-                        View Results <ChevronRight size={12} />
+                        <span>View Results</span>
+                        <ArrowRight size={14} />
                       </button>
                     </td>
                   </tr>

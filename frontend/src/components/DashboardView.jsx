@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  UploadCloud, 
-  CheckCircle2, 
-  AlertTriangle, 
-  BookOpen, 
-  History, 
-  Activity, 
-  ShieldCheck, 
-  Cpu, 
-  Database,
-  ArrowRight,
+import {
+  TrendingUp,
+  CheckCircle2,
+  AlertTriangle,
+  Sparkles,
   RefreshCw,
-  Search,
-  FileText,
-  ExternalLink,
-  ChevronRight
+  ArrowRight,
+  BarChart3,
+  Activity
 } from 'lucide-react';
+import { formatNumber, formatPercent } from '../utils/formatters.js';
 
 export function DashboardView({ health, onNavigate }) {
   const [runs, setRuns] = useState([]);
@@ -57,159 +50,369 @@ export function DashboardView({ health, onNavigate }) {
   const explainedExceptions = summary?.aiExplained ?? exceptions.filter(e => e.ai_investigation_status === 'COMPLETED').length;
   const overallMatchRate = summary?.overallMatchRate ?? (latestRun?.match_rate || 0);
 
+  if (loading) {
+    return (
+      <div className="page-content" style={{ padding: '3rem', textAlign: 'center' }}>
+        <RefreshCw size={32} className="spin" style={{ color: 'var(--sibo-primary)' }} />
+        <p style={{ marginTop: '1rem', color: 'var(--sibo-text-muted)' }}>
+          Loading dashboard metrics...
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="page-content dashboard-view" style={{ padding: '3rem 2rem' }}>
+      {/* Page Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: '2rem',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>
-            FINANCE OPERATIONS CONTROL CENTER
+          <h2 style={{
+            fontSize: '2rem',
+            fontWeight: 900,
+            color: 'var(--sibo-text-primary)',
+            marginBottom: '0.5rem',
+            letterSpacing: '-0.02em'
+          }}>
+            Finance Operations Dashboard
           </h2>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 500 }}>
-            Autonomous payment settlement reconciliation & AI evidence investigation engine.
+          <p style={{
+            fontSize: '1rem',
+            color: 'var(--sibo-text-secondary)'
+          }}>
+            Real-time reconciliation metrics and AI investigation status
           </p>
         </div>
-        <button onClick={fetchDashboardData} className="btn btn-secondary" style={{ padding: '8px 14px' }}>
-          <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh Metrics
+
+        <button
+          onClick={fetchDashboardData}
+          className="btn btn-outline-secondary"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          <RefreshCw size={16} />
+          <span>Refresh</span>
         </button>
       </div>
 
-      {/* System Status Cards — Neobrutalist Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-        <div className="neo-card neo-card-yellow">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ padding: '12px', background: '#000', border: '2px solid var(--primary-yellow)', borderRadius: 'var(--radius-sm)' }}>
-              <Cpu size={24} color="var(--primary-yellow)" />
-            </div>
-            <div>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>AI Reasoning Model</div>
-              <div style={{ fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{health?.llmModel || 'openai/gpt-oss-120b'}</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--primary-yellow)', fontWeight: 700 }}>131K Token Reasoning Context</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="neo-card neo-card-cyan">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ padding: '12px', background: '#000', border: '2px solid var(--primary-cyan)', borderRadius: 'var(--radius-sm)' }}>
-              <BookOpen size={24} color="var(--primary-cyan)" />
-            </div>
-            <div>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Embedding & Vector DB</div>
-              <div style={{ fontSize: '1rem', fontWeight: 900, color: '#fff' }}>Qwen3-0.6B (1024d)</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--primary-cyan)', fontWeight: 700 }}>Supabase pgvector (54 Chunks)</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="neo-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ padding: '12px', background: '#000', border: '2px solid var(--primary-green)', borderRadius: 'var(--radius-sm)' }}>
-              <ShieldCheck size={24} color="var(--primary-green)" />
-            </div>
-            <div>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Reconciliation Guard</div>
-              <div style={{ fontSize: '1rem', fontWeight: 900, color: '#fff' }}>Deterministic Engine</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--primary-green)', fontWeight: 700 }}>Zero Hallucination Math</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Metrics Banner or Empty State */}
       {runs.length === 0 ? (
-        <div className="neo-card" style={{ padding: '48px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', background: 'var(--bg-card-alt)' }}>
-          <div style={{ width: '64px', height: '64px', background: 'var(--primary-yellow)', border: '2px solid #000', boxShadow: '3px 3px 0px #000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <UploadCloud size={32} color="#000" />
+        /* Empty State */
+        <div className="card" style={{
+          padding: '3rem',
+          textAlign: 'center',
+          maxWidth: '600px',
+          margin: '0 auto'
+        }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            background: 'var(--sibo-primary-light)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 1.5rem'
+          }}>
+            <BarChart3 size={40} style={{ color: 'var(--sibo-primary)' }} />
           </div>
-          <div style={{ maxWidth: '520px' }}>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 900, color: '#fff', marginBottom: '8px' }}>NO RECONCILIATION RUNS YET</h3>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-              Upload payment and settlement CSV datasets or load a synthetic test dataset to run the deterministic reconciliation engine.
-            </p>
-          </div>
-          <button onClick={() => onNavigate('/reconcile')} className="btn btn-primary" style={{ marginTop: '8px' }}>
-            <UploadCloud size={18} /> Upload First Dataset
+
+          <h3 style={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            color: 'var(--sibo-text-primary)',
+            marginBottom: '0.75rem'
+          }}>
+            No reconciliation runs yet
+          </h3>
+
+          <p style={{
+            fontSize: '1rem',
+            color: 'var(--sibo-text-secondary)',
+            marginBottom: '2rem',
+            lineHeight: 1.6
+          }}>
+            Upload payment and settlement CSV datasets to run the deterministic
+            reconciliation engine and start tracking your financial operations.
+          </p>
+
+          <button
+            onClick={() => onNavigate('/reconcile')}
+            className="btn btn-primary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <span>Upload First Dataset</span>
+            <ArrowRight size={18} />
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <>
           {/* Key Metrics Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-            <div className="neo-card" style={{ background: '#1e293b' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Records</div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#fff', marginTop: '4px' }}>{totalProcessed}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Across {runs.length} run(s)</div>
-            </div>
-
-            <div className="neo-card" style={{ background: '#1e293b' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Overall Match Rate</div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary-green)', marginTop: '4px' }}>
-                {overallMatchRate}%
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
+            {/* Total Records */}
+            <div className="card">
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'var(--sibo-primary-light)',
+                  borderRadius: 'var(--sibo-radius-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Activity size={24} style={{ color: 'var(--sibo-primary)' }} />
+                </div>
+                <span className="badge badge-neutral" style={{ fontSize: '0.6875rem' }}>
+                  ALL TIME
+                </span>
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Across all {runs.length} run(s)</div>
+
+              <div style={{
+                fontSize: '2.25rem',
+                fontWeight: 900,
+                color: 'var(--sibo-text-primary)',
+                marginBottom: '0.5rem',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em'
+              }}>
+                {formatNumber(totalProcessed)}
+              </div>
+
+              <div style={{
+                fontSize: '0.875rem',
+                color: 'var(--sibo-text-muted)',
+                fontWeight: 600
+              }}>
+                Total records processed
+              </div>
             </div>
 
-            <div className="neo-card" style={{ background: '#1e293b' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Active Exceptions</div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary-red)', marginTop: '4px' }}>{totalExceptions}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Flagged by Rec Engine</div>
+            {/* Match Rate */}
+            <div className="card">
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'var(--sibo-success-light)',
+                  borderRadius: 'var(--sibo-radius-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <CheckCircle2 size={24} style={{ color: 'var(--sibo-success)' }} />
+                </div>
+                <TrendingUp size={20} style={{ color: 'var(--sibo-success)' }} />
+              </div>
+
+              <div style={{
+                fontSize: '2.25rem',
+                fontWeight: 900,
+                color: 'var(--sibo-success)',
+                marginBottom: '0.5rem',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em'
+              }}>
+                {formatPercent(overallMatchRate)}
+              </div>
+
+              <div style={{
+                fontSize: '0.875rem',
+                color: 'var(--sibo-text-muted)',
+                fontWeight: 600
+              }}>
+                Overall match rate
+              </div>
             </div>
 
-            <div className="neo-card" style={{ background: '#1e293b' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>AI Explained</div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary-cyan)', marginTop: '4px' }}>{explainedExceptions}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Investigated via Groq RAG</div>
+            {/* Active Exceptions */}
+            <div className="card">
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'var(--sibo-warning-light)',
+                  borderRadius: 'var(--sibo-radius-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <AlertTriangle size={24} style={{ color: 'var(--sibo-warning)' }} />
+                </div>
+                <button
+                  onClick={() => onNavigate('/exceptions')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    color: 'var(--sibo-primary)'
+                  }}
+                >
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+
+              <div style={{
+                fontSize: '2.25rem',
+                fontWeight: 900,
+                color: 'var(--sibo-text-primary)',
+                marginBottom: '0.5rem',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em'
+              }}>
+                {formatNumber(totalExceptions)}
+              </div>
+
+              <div style={{
+                fontSize: '0.875rem',
+                color: 'var(--sibo-text-muted)',
+                fontWeight: 600
+              }}>
+                Active exceptions
+              </div>
+            </div>
+
+            {/* AI Investigated */}
+            <div className="card">
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'var(--sibo-info-light)',
+                  borderRadius: 'var(--sibo-radius-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Sparkles size={24} style={{ color: 'var(--sibo-info)' }} />
+                </div>
+                <span className="badge badge-info" style={{ fontSize: '0.6875rem' }}>
+                  AI
+                </span>
+              </div>
+
+              <div style={{
+                fontSize: '2.25rem',
+                fontWeight: 900,
+                color: 'var(--sibo-text-primary)',
+                marginBottom: '0.5rem',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em'
+              }}>
+                {formatNumber(explainedExceptions)}
+              </div>
+
+              <div style={{
+                fontSize: '0.875rem',
+                color: 'var(--sibo-text-muted)',
+                fontWeight: 600
+              }}>
+                AI-investigated cases
+              </div>
             </div>
           </div>
 
           {/* Recent Exceptions Table */}
-          <div className="neo-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fff', textTransform: 'uppercase' }}>
-                Recent Reconciliation Exceptions
-              </h3>
-              <button onClick={() => onNavigate('/exceptions')} className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>
-                View All Exceptions <ArrowRight size={14} />
-              </button>
-            </div>
+          {exceptions.length > 0 && (
+            <div className="card" style={{ padding: '1.5rem' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem'
+              }}>
+                <h3 style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 700,
+                  color: 'var(--sibo-text-primary)'
+                }}>
+                  Recent exceptions
+                </h3>
 
-            {exceptions.length === 0 ? (
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>No active exceptions found.</p>
-            ) : (
+                <button
+                  onClick={() => onNavigate('/exceptions')}
+                  className="btn btn-outline-secondary"
+                  style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+                >
+                  <span>View all</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                <table>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #334155', color: 'var(--text-muted)' }}>
-                      <th style={{ padding: '10px' }}>TRANSACTION ID</th>
-                      <th style={{ padding: '10px' }}>CATEGORY</th>
-                      <th style={{ padding: '10px' }}>DIFFERENCE</th>
-                      <th style={{ padding: '10px' }}>AI INVESTIGATION STATUS</th>
-                      <th style={{ padding: '10px', textAlign: 'right' }}>ACTION</th>
+                    <tr>
+                      <th>Transaction ID</th>
+                      <th>Category</th>
+                      <th>Variance</th>
+                      <th>Status</th>
+                      <th style={{ textAlign: 'right' }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {exceptions.slice(0, 5).map((exc) => (
-                      <tr key={exc.id} style={{ borderBottom: '1px solid #334155' }}>
-                        <td style={{ padding: '12px 10px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{exc.transaction_id}</td>
-                        <td style={{ padding: '12px 10px' }}>
-                          <span className="badge badge-warning">{exc.category}</span>
+                      <tr key={exc.id}>
+                        <td>
+                          <code className="font-mono" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                            {exc.transaction_id}
+                          </code>
                         </td>
-                        <td style={{ padding: '12px 10px', fontWeight: 700, color: exc.difference !== 0 ? 'var(--primary-red)' : '#fff' }}>
-                          ₹{exc.difference}
-                        </td>
-                        <td style={{ padding: '12px 10px' }}>
-                          <span className={`badge ${exc.ai_investigation_status === 'COMPLETED' ? 'badge-success' : 'badge-muted'}`}>
-                            {exc.ai_investigation_status || 'PENDING'}
+                        <td>
+                          <span className="badge badge-warning">
+                            {exc.category?.toLowerCase().replace(/_/g, ' ')}
                           </span>
                         </td>
-                        <td style={{ padding: '12px 10px', textAlign: 'right' }}>
-                          <button 
+                        <td style={{
+                          fontWeight: 700,
+                          color: exc.difference !== 0 ? 'var(--sibo-error)' : 'var(--sibo-text-primary)',
+                          fontVariantNumeric: 'tabular-nums'
+                        }}>
+                          ₹{exc.difference}
+                        </td>
+                        <td>
+                          <span className={`badge ${exc.ai_investigation_status === 'COMPLETED' ? 'badge-success' : 'badge-neutral'}`}>
+                            {exc.ai_investigation_status === 'COMPLETED' ? 'Investigated' : 'Needs investigation'}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <button
                             onClick={() => onNavigate(`/exceptions/${exc.id}`)}
-                            className="btn btn-primary"
-                            style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                            className="btn btn-outline-secondary"
+                            style={{ padding: '0.375rem 0.875rem', fontSize: '0.8125rem' }}
                           >
-                            Inspect <ChevronRight size={12} />
+                            <span>Inspect</span>
+                            <ArrowRight size={14} />
                           </button>
                         </td>
                       </tr>
@@ -217,9 +420,9 @@ export function DashboardView({ health, onNavigate }) {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

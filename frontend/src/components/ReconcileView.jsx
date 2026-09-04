@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UploadCloud, CheckCircle2, AlertOctagon, Play, FileText, RefreshCw, Zap } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, AlertCircle, Loader2, Play, Zap, ArrowRight } from 'lucide-react';
 
 export function ReconcileView({ onNavigate }) {
   const [paymentsFile, setPaymentsFile] = useState(null);
@@ -10,14 +10,12 @@ export function ReconcileView({ onNavigate }) {
   const [runResult, setRunResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  // Load synthetic dataset preset directly
   const handleSyntheticPreset = async () => {
     setErrorMsg(null);
     setValidating(true);
     setValidationSummary(null);
 
     try {
-      // Generate synthetic dataset matching Phase 4 schema and scenarios
       const paymentColumns = ['transaction_id', 'payment_amount', 'payment_date', 'payment_method', 'status', 'metadata'];
       const settlementColumns = ['settlement_id', 'transaction_id', 'payment_amount', 'fee', 'tax', 'adjustment', 'refund', 'settlement_amount', 'settlement_date', 'metadata'];
 
@@ -32,7 +30,6 @@ export function ReconcileView({ onNavigate }) {
         const tax = (3.6 + i * 0.54).toFixed(2);
         let sAmt = (parseFloat(pAmt) - parseFloat(fee) - parseFloat(tax)).toFixed(2);
 
-        // Introduce scenarios: record 3 amount mismatch, record 7 component mismatch
         if (i === 3) sAmt = (parseFloat(sAmt) + 50.00).toFixed(2);
         if (i === 7) sAmt = (parseFloat(sAmt) - 25.00).toFixed(2);
 
@@ -45,7 +42,7 @@ export function ReconcileView({ onNavigate }) {
           metadata: JSON.stringify({ batch: 'synthetic' })
         });
 
-        if (i !== 5) { // record 5 missing settlement
+        if (i !== 5) {
           settlements.push({
             settlement_id: stlId,
             transaction_id: txId,
@@ -62,7 +59,7 @@ export function ReconcileView({ onNavigate }) {
       }
 
       const toCsv = (arr, cols) => [
-        cols.join(','), 
+        cols.join(','),
         ...arr.map(r => cols.map(c => {
           const val = String(r[c] || '');
           if (val.includes('"') || val.includes(',') || val.includes('\n')) {
@@ -95,7 +92,6 @@ export function ReconcileView({ onNavigate }) {
       setValidating(false);
     }
   };
-
 
   const handleManualUpload = async (e) => {
     e.preventDefault();
@@ -156,147 +152,443 @@ export function ReconcileView({ onNavigate }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>
-          DATASET UPLOADER & RECONCILIATION
+    <div className="page-content reconcile-view" style={{ padding: '3rem 2rem' }}>
+      {/* Page Header */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h2 style={{
+          fontSize: '2rem',
+          fontWeight: 900,
+          color: 'var(--sibo-text-primary)',
+          marginBottom: '0.5rem',
+          letterSpacing: '-0.02em'
+        }}>
+          Upload & Reconcile
         </h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 500 }}>
-          Upload financial payment and settlement CSV files or load a pre-configured synthetic dataset.
+        <p style={{
+          fontSize: '1rem',
+          color: 'var(--sibo-text-secondary)'
+        }}>
+          Upload payment and settlement CSV files or load a synthetic test dataset
         </p>
       </div>
 
+      {/* Error Display */}
       {errorMsg && (
-        <div className="neo-card" style={{ borderColor: 'var(--primary-red)', background: '#2c0b0e', padding: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#fff', fontWeight: 700 }}>
-            <AlertOctagon color="var(--primary-red)" size={20} />
-            <span>{errorMsg}</span>
-          </div>
+        <div className="card" style={{
+          borderColor: 'var(--sibo-error)',
+          background: 'var(--sibo-error-light)',
+          padding: '1rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
+          <AlertCircle size={20} style={{ color: 'var(--sibo-error)', flexShrink: 0 }} />
+          <span style={{ color: 'var(--sibo-error)', fontWeight: 600 }}>
+            {errorMsg}
+          </span>
         </div>
       )}
 
-      {/* Preset Banner */}
-      <div className="neo-card neo-card-yellow" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Zap size={18} color="var(--primary-yellow)" /> QUICK TEST PRESET (SYNTHETIC DATASET)
-          </h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Generates 100 payments and 92 settlements with built-in Razorpay discrepancy scenarios (`AMOUNT_MISMATCH`, `DUPLICATE_TRANSACTION`, `MISSING_SETTLEMENT`, etc.).
-          </p>
+      {/* Quick Start - Synthetic Preset */}
+      <div className="card" style={{
+        padding: '1.5rem',
+        marginBottom: '1.5rem',
+        background: 'linear-gradient(135deg, var(--sibo-primary-light) 0%, var(--sibo-bg-surface) 100%)',
+        border: '1px solid var(--sibo-primary)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              marginBottom: '0.5rem'
+            }}>
+              <Zap size={20} style={{ color: 'var(--sibo-primary)' }} />
+              <h3 style={{
+                fontSize: '1.125rem',
+                fontWeight: 700,
+                color: 'var(--sibo-text-primary)'
+              }}>
+                Quick test dataset
+              </h3>
+            </div>
+            <p style={{
+              fontSize: '0.9375rem',
+              color: 'var(--sibo-text-secondary)'
+            }}>
+              Load 60 synthetic payment & settlement records with built-in discrepancy scenarios
+            </p>
+          </div>
+
+          <button
+            onClick={handleSyntheticPreset}
+            disabled={validating}
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            {validating ? (
+              <>
+                <Loader2 size={16} className="spin" />
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <Zap size={16} />
+                <span>Load synthetic data</span>
+              </>
+            )}
+          </button>
         </div>
-        <button 
-          onClick={handleSyntheticPreset} 
-          disabled={validating}
-          className="btn btn-primary"
-        >
-          {validating ? <RefreshCw size={16} className="spin" /> : <Zap size={16} />}
-          Load Synthetic Dataset
-        </button>
       </div>
 
-      {/* Upload Box */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-        {/* Payment File Upload */}
-        <div className="neo-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 900, color: '#fff', marginBottom: '12px', textTransform: 'uppercase' }}>
-            1. Payment Records CSV
-          </h3>
-          <input 
-            type="file" 
+      {/* Upload Sections */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '1.5rem',
+        marginBottom: '1.5rem'
+      }}>
+        {/* Payment Records Upload */}
+        <div className="card" style={{
+          padding: '1.5rem',
+          borderStyle: 'dashed',
+          borderColor: paymentsFile ? 'var(--sibo-success)' : 'var(--sibo-border)',
+          background: paymentsFile ? 'var(--sibo-success-light)' : 'var(--sibo-bg-surface)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '1rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'var(--sibo-primary-light)',
+              borderRadius: 'var(--sibo-radius-lg)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <FileText size={24} style={{ color: 'var(--sibo-primary)' }} />
+            </div>
+            <div>
+              <h3 style={{
+                fontSize: '1.125rem',
+                fontWeight: 700,
+                color: 'var(--sibo-text-primary)',
+                marginBottom: '0.5rem'
+              }}>
+                Payment transactions
+              </h3>
+              <p style={{
+                fontSize: '0.875rem',
+                color: 'var(--sibo-text-secondary)'
+              }}>
+                CSV with transaction_id, payment_amount, payment_date, payment_method, status
+              </p>
+            </div>
+          </div>
+
+          <input
+            type="file"
             accept=".csv"
             onChange={(e) => setPaymentsFile(e.target.files[0])}
-            style={{ width: '100%', padding: '10px', background: '#0f172a', border: '2px solid #334155', borderRadius: 'var(--radius-sm)', color: '#fff', fontSize: '0.85rem' }}
+            style={{ marginBottom: '1rem' }}
           />
+
           {paymentsFile && (
-            <div style={{ marginTop: '10px', fontSize: '0.8rem', color: 'var(--primary-green)', fontWeight: 700 }}>
-              Selected: {paymentsFile.name} ({(paymentsFile.size / 1024).toFixed(1)} KB)
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem',
+              background: 'var(--sibo-bg-alt)',
+              borderRadius: 'var(--sibo-radius-md)'
+            }}>
+              <CheckCircle2 size={16} style={{ color: 'var(--sibo-success)' }} />
+              <span style={{ fontSize: '0.875rem', color: 'var(--sibo-text-primary)' }}>
+                {paymentsFile.name} ({(paymentsFile.size / 1024).toFixed(1)} KB)
+              </span>
             </div>
           )}
         </div>
 
-        {/* Settlement File Upload */}
-        <div className="neo-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 900, color: '#fff', marginBottom: '12px', textTransform: 'uppercase' }}>
-            2. Settlement Records CSV
-          </h3>
-          <input 
-            type="file" 
+        {/* Settlement Records Upload */}
+        <div className="card" style={{
+          padding: '1.5rem',
+          borderStyle: 'dashed',
+          borderColor: settlementsFile ? 'var(--sibo-success)' : 'var(--sibo-border)',
+          background: settlementsFile ? 'var(--sibo-success-light)' : 'var(--sibo-bg-surface)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '1rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'var(--sibo-info-light)',
+              borderRadius: 'var(--sibo-radius-lg)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <FileText size={24} style={{ color: 'var(--sibo-info)' }} />
+            </div>
+            <div>
+              <h3 style={{
+                fontSize: '1.125rem',
+                fontWeight: 700,
+                color: 'var(--sibo-text-primary)',
+                marginBottom: '0.5rem'
+              }}>
+                Settlement records
+              </h3>
+              <p style={{
+                fontSize: '0.875rem',
+                color: 'var(--sibo-text-secondary)'
+              }}>
+                CSV with settlement_id, transaction_id, payment_amount, fee, tax, settlement_amount, settlement_date
+              </p>
+            </div>
+          </div>
+
+          <input
+            type="file"
             accept=".csv"
             onChange={(e) => setSettlementsFile(e.target.files[0])}
-            style={{ width: '100%', padding: '10px', background: '#0f172a', border: '2px solid #334155', borderRadius: 'var(--radius-sm)', color: '#fff', fontSize: '0.85rem' }}
+            style={{ marginBottom: '1rem' }}
           />
+
           {settlementsFile && (
-            <div style={{ marginTop: '10px', fontSize: '0.8rem', color: 'var(--primary-green)', fontWeight: 700 }}>
-              Selected: {settlementsFile.name} ({(settlementsFile.size / 1024).toFixed(1)} KB)
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem',
+              background: 'var(--sibo-bg-alt)',
+              borderRadius: 'var(--sibo-radius-md)'
+            }}>
+              <CheckCircle2 size={16} style={{ color: 'var(--sibo-success)' }} />
+              <span style={{ fontSize: '0.875rem', color: 'var(--sibo-text-primary)' }}>
+                {settlementsFile.name} ({(settlementsFile.size / 1024).toFixed(1)} KB)
+              </span>
             </div>
           )}
         </div>
       </div>
 
+      {/* Manual Upload Button */}
       {paymentsFile && settlementsFile && !validationSummary && (
-        <button onClick={handleManualUpload} disabled={validating} className="btn btn-secondary" style={{ alignSelf: 'flex-start' }}>
-          {validating ? <RefreshCw size={16} className="spin" /> : <UploadCloud size={16} />}
-          Validate & Ingest Selected CSVs
+        <button
+          onClick={handleManualUpload}
+          disabled={validating}
+          className="btn btn-primary"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            marginBottom: '1.5rem'
+          }}
+        >
+          {validating ? (
+            <>
+              <Loader2 size={16} className="spin" />
+              <span>Validating & ingesting...</span>
+            </>
+          ) : (
+            <>
+              <Upload size={16} />
+              <span>Validate & ingest files</span>
+            </>
+          )}
         </button>
       )}
 
-      {/* Validation Results Card */}
+      {/* Validation Success */}
       {validationSummary && (
-        <div className="neo-card neo-card-cyan" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CheckCircle2 color="var(--primary-cyan)" size={20} /> DATASET VALIDATION SUCCESSFUL
+        <div className="card" style={{
+          borderColor: 'var(--sibo-success)',
+          padding: '1.5rem',
+          marginBottom: '1.5rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            marginBottom: '1.5rem'
+          }}>
+            <CheckCircle2 size={24} style={{ color: 'var(--sibo-success)' }} />
+            <h3 style={{
+              fontSize: '1.125rem',
+              fontWeight: 700,
+              color: 'var(--sibo-text-primary)'
+            }}>
+              Dataset validated successfully
             </h3>
-            <span className="badge badge-info">Run ID: {validationSummary.runId}</span>
+            <span className="badge badge-success" style={{ marginLeft: 'auto' }}>
+              Run ID: {validationSummary.runId?.slice(0, 8)}
+            </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', background: '#0f172a', padding: '16px', borderRadius: 'var(--radius-sm)', border: '2px solid #334155' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: '1rem',
+            padding: '1.5rem',
+            background: 'var(--sibo-bg-alt)',
+            borderRadius: 'var(--sibo-radius-lg)',
+            marginBottom: '1.5rem'
+          }}>
             <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>PAYMENTS INGESTED</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>
+              <div style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'var(--sibo-text-muted)',
+                marginBottom: '0.5rem'
+              }}>
+                Payments
+              </div>
+              <div style={{
+                fontSize: '1.5rem',
+                fontWeight: 900,
+                color: 'var(--sibo-text-primary)',
+                fontVariantNumeric: 'tabular-nums'
+              }}>
                 {validationSummary.paymentFile?.validRows ?? validationSummary.paymentsIngested ?? 0}
               </div>
             </div>
+
             <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>SETTLEMENTS INGESTED</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>
+              <div style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'var(--sibo-text-muted)',
+                marginBottom: '0.5rem'
+              }}>
+                Settlements
+              </div>
+              <div style={{
+                fontSize: '1.5rem',
+                fontWeight: 900,
+                color: 'var(--sibo-text-primary)',
+                fontVariantNumeric: 'tabular-nums'
+              }}>
                 {validationSummary.settlementFile?.validRows ?? validationSummary.settlementsIngested ?? 0}
               </div>
             </div>
+
             <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>SCHEMA STATUS</div>
-              <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--primary-green)', marginTop: '4px' }}>VALIDATED</div>
+              <div style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'var(--sibo-text-muted)',
+                marginBottom: '0.5rem'
+              }}>
+                Schema
+              </div>
+              <div style={{
+                fontSize: '1rem',
+                fontWeight: 700,
+                color: 'var(--sibo-success)'
+              }}>
+                Validated
+              </div>
             </div>
           </div>
 
           {!runResult ? (
-            <button 
-              onClick={handleStartReconciliation} 
+            <button
+              onClick={handleStartReconciliation}
               disabled={reconciling}
-              className="btn btn-primary" 
-              style={{ alignSelf: 'flex-start', marginTop: '8px' }}
+              className="btn btn-primary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              {reconciling ? <RefreshCw size={16} className="spin" /> : <Play size={16} />}
-              Run Deterministic Reconciliation Engine
+              {reconciling ? (
+                <>
+                  <Loader2 size={16} className="spin" />
+                  <span>Running reconciliation...</span>
+                </>
+              ) : (
+                <>
+                  <Play size={16} />
+                  <span>Start reconciliation</span>
+                </>
+              )}
             </button>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px', background: '#1e293b', padding: '16px', borderRadius: 'var(--radius-sm)', border: '2px solid var(--primary-green)' }}>
-              <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--primary-green)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={18} /> RECONCILIATION COMPLETED SUCCESSFULLY!
+            <div style={{
+              padding: '1.5rem',
+              background: 'var(--sibo-success-light)',
+              border: '1px solid var(--sibo-success)',
+              borderRadius: 'var(--sibo-radius-lg)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1rem'
+              }}>
+                <CheckCircle2 size={20} style={{ color: 'var(--sibo-success)' }} />
+                <h4 style={{
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  color: 'var(--sibo-text-primary)'
+                }}>
+                  Reconciliation completed
+                </h4>
               </div>
-              <div style={{ fontSize: '0.9rem', color: '#fff' }}>
-                Processed <strong>{runResult.totalRecords}</strong> transactions: 
-                <span style={{ color: 'var(--primary-green)', fontWeight: 800, margin: '0 6px' }}>{runResult.matchedCount} Matched</span> and 
-                <span style={{ color: 'var(--primary-red)', fontWeight: 800, margin: '0 6px' }}>{runResult.exceptionCount} Exceptions</span> 
-                (Match Rate: <strong>{runResult.matchRate}%</strong>).
+
+              <div style={{
+                fontSize: '0.9375rem',
+                color: 'var(--sibo-text-primary)',
+                marginBottom: '1rem'
+              }}>
+                Processed <strong>{runResult.totalRecords}</strong> transactions:{' '}
+                <span style={{ color: 'var(--sibo-success)', fontWeight: 700 }}>
+                  {runResult.matchedCount} matched
+                </span>{' '}
+                <span style={{ color: 'var(--sibo-error)', fontWeight: 700 }}>
+                  {runResult.exceptionCount} exceptions
+                </span>{' '}
+                (Match rate: <strong>{runResult.matchRate}%</strong>)
               </div>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                <button onClick={() => onNavigate('/results')} className="btn btn-primary" style={{ fontSize: '0.8rem' }}>
-                  View All Results
+
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => onNavigate('/results')}
+                  className="btn btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
+                >
+                  <span>View results</span>
+                  <ArrowRight size={16} />
                 </button>
-                <button onClick={() => onNavigate('/exceptions')} className="btn btn-secondary" style={{ fontSize: '0.8rem' }}>
-                  Inspect Exceptions & AI
+                <button
+                  onClick={() => onNavigate('/exceptions')}
+                  className="btn btn-outline-secondary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
+                >
+                  <span>View exceptions</span>
+                  <ArrowRight size={16} />
                 </button>
               </div>
             </div>
