@@ -170,9 +170,9 @@ export function LandingHero({ onNavigate }) {
             marginBottom: 'var(--sibo-space-xl)',
             border: '1px solid rgba(37, 99, 235, 0.2)'
           }}>
-           
-            
-            
+
+
+
           </div>
 
           {/* Huge Editorial Headline - Matching Reference Exactly */}
@@ -198,7 +198,7 @@ export function LandingHero({ onNavigate }) {
             marginBottom: 'var(--sibo-space-2xl)',
             maxWidth: '500px'
           }}>
-           Turn payment and settlement data into a clear financial picture. SiBo detects discrepancies, explains exceptions, and helps teams resolve them faster.
+            Turn payment and settlement data into a clear financial picture. SiBo detects discrepancies, explains exceptions, and helps teams resolve them faster.
           </p>
 
           {/* Single CTA - Matching Reference exactly: tall square button with top-left external icon */}
@@ -252,30 +252,19 @@ export function LandingHero({ onNavigate }) {
           marginBottom: '2.5rem'
         }}>
           <div style={{
-            fontSize: '0.8125rem',
+            fontSize: '2rem',
             fontWeight: 600,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             color: 'rgba(255,255,255,0.7)'
           }}>
-            SAVINGS TVL
+            RAG Intelligence
           </div>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.6">
             <rect x="5" y="2" width="4" height="20" rx="1" />
             <rect x="10" y="2" width="4" height="20" rx="1" />
             <rect x="15" y="2" width="4" height="20" rx="1" />
           </svg>
-        </div>
-
-        <div style={{
-          fontSize: '3.75rem',
-          fontWeight: 800,
-          lineHeight: 1,
-          letterSpacing: '-0.03em',
-          color: 'white',
-          marginBottom: '2rem'
-        }}>
-          $4.07B
         </div>
 
         {/* Progress Bar */}
