@@ -509,6 +509,6 @@ Clearly labeled as future work - not currently implemented:
 
 > Detailed technical documentation covering the system design, implementation decisions, API behavior, reconciliation logic, RAG pipeline, AI orchestration, testing, limitations, and development journey will be linked here.
 
-`https://docs.google.com/document/d/1L1pHVx3u_TT0XA97x5VuP8Rya-TiUebN/edit`
+    https://docs.google.com/document/d/1L1pHVx3u_TT0XA97x5VuP8Rya-TiUebN/edit
 
 
