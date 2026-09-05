@@ -58,18 +58,31 @@ This separation ensures financial integrity while providing intelligent assistan
 
 ## Key Features
 
-✅ **CSV Ingestion** - Upload payment and settlement datasets via drag-and-drop interface
-✅ **Schema Validation** - Validates required fields and data types before processing
-✅ **Deterministic Reconciliation Engine** - Rule-based financial matching with explicit formulas
-✅ **Exception Classification** - Automatically categorizes mismatches into 6 exception types
-✅ **Exception Inspection** - Detailed views showing payment/settlement breakdown and variance
-✅ **AI Investigation** - LangChain.js orchestrated Groq analysis with RAG retrieval
-✅ **RAG Knowledge Search** - Semantic search over official Razorpay settlement documentation
-✅ **Razorpay Documentation Grounding** - AI explanations cite authoritative sources
-✅ **Supabase Persistence** - All data stored in PostgreSQL with pgvector for embeddings
-✅ **Run History** - Audit log of all reconciliation executions
-✅ **Authentication** - Not implemented (not required by specification)
-✅ **Frontend Workflow** - Complete 6-page React/Vite application with responsive design
+CSV Ingestion – Drag-and-drop upload for payment and settlement datasets
+
+Schema Validation – Checks required fields and data types before any processing starts
+
+Deterministic Reconciliation Engine – Rule-based matching with transparent, explicit formulas (no black-box logic)
+
+Exception Classification – Automatically sorts mismatches into 6 distinct exception types
+
+Exception Inspection – Drill into any exception to see the full payment/settlement breakdown and variance
+
+AI Investigation – Groq-powered analysis orchestrated via LangChain.js, with RAG retrieval for context
+
+RAG Knowledge Search – Semantic search across official Razorpay settlement docs
+
+Razorpay Documentation Grounding – AI explanations are grounded in and cite authoritative sources
+
+Supabase Persistence – All data lives in PostgreSQL, with pgvector handling embeddings
+
+Run History – Full audit trail of past reconciliation runs
+
+Authentication – Skipped, since it wasn't required by the spec
+
+Frontend Workflow – A complete 6-page React/Vite app, responsive across screen sizes
+
+
 
 ## Reconciliation Engine
 
